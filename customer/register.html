@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>إنشاء حساب | ZOMA</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/app.js"></script>
+</head>
+
+<body>
+
+<div class="auth-wrap">
+  <div class="panel auth">
+
+    <a class="brand" href="../index.html">
+      <span class="brand-badge">Z</span>
+      ZOMA
+    </a>
+
+    <h1>إنشاء حساب</h1>
+
+    <form id="f" class="form">
+
+      <div class="grid-2">
+
+        <div class="field">
+          <label for="n1">الاسم الأول</label>
+          <input id="n1" type="text" autocomplete="given-name" required>
+        </div>
+
+        <div class="field">
+          <label for="n2">الاسم الثاني</label>
+          <input id="n2" type="text" required>
+        </div>
+
+        <div class="field">
+          <label for="n3">الاسم الثالث</label>
+          <input id="n3" type="text" required>
+        </div>
+
+        <div class="field">
+          <label for="n4">اسم العائلة</label>
+          <input id="n4" type="text" required>
+        </div>
+
+      </div>
+
+      <div class="field">
+        <label for="phone">رقم الهاتف</label>
+
+        <input
+          id="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="password">كلمة المرور</label>
+
+        <input
+          id="password"
+          type="password"
+          minlength="6"
+          autocomplete="new-password"
+          required
+        >
+      </div>
+
+      <button
+        id="registerBtn"
+        class="btn primary"
+        type="submit"
+      >
+        إنشاء الحساب
+      </button>
+
+    </form>
+
+    <div class="help">
+      <a class="link" href="login.html">
+        لدي حساب بالفعل
+      </a>
+    </div>
+
+  </div>
+</div>
+
+
+<script>
+(function () {
+
+  /* =========================
+     DOM Elements
+  ========================= */
+
+  const form = document.getElementById('f');
+
+  const n1Input = document.getElementById('n1');
+  const n2Input = document.getElementById('n2');
+  const n3Input = document.getElementById('n3');
+  const n4Input = document.getElementById('n4');
+
+  const phoneInput = document.getElementById('phone');
+  const passwordInput = document.getElementById('password');
+
+  const registerBtn = document.getElementById('registerBtn');
+
+
+  /* =========================
+     Register
+  ========================= */
+
+  form.addEventListener('submit', async function (e) {
+
+    e.preventDefault();
+
+    const n1 = n1Input.value.trim();
+    const n2 = n2Input.value.trim();
+    const n3 = n3Input.value.trim();
+    const n4 = n4Input.value.trim();
+
+    const phone = phoneInput.value.trim();
+    const password = passwordInput.value;
+
+
+    /* التأكد من الأسماء */
+
+    if (!n1 || !n2 || !n3 || !n4) {
+      zoma.toast(
+        'من فضلك أدخل الاسم رباعيًا',
+        'error'
+      );
+      return;
+    }
+
+
+    /* التأكد من رقم الهاتف */
+
+    if (!phone) {
+      zoma.toast(
+        'من فضلك أدخل رقم الهاتف',
+        'error'
+      );
+      return;
+    }
+
+
+    /* التأكد من كلمة المرور */
+
+    if (password.length < 6) {
+      zoma.toast(
+        'كلمة المرور يجب أن تكون 6 أحرف أو أكثر',
+        'error'
+      );
+      return;
+    }
+
+
+    /* الاسم الكامل */
+
+    const fullName = [
+      n1,
+      n2,
+      n3,
+      n4
+    ].join(' ');
+
+
+    /*
+     * إنشاء بريد داخلي للحساب
+     *
+     * Supabase Auth يحتاج email/password
+     * بينما العميل يدخل برقم الهاتف.
+     */
+
+    const phoneDigits = phone.replace(/\D/g, '');
+
+    if (!phoneDigits) {
+      zoma.toast(
+        'رقم الهاتف غير صحيح',
+        'error'
+      );
+      return;
+    }
+
+    const email =
+      'phone_' +
+      phoneDigits +
+      '@zoma.local';
+
+
+    /* تعطيل الزر أثناء الإنشاء */
+
+    registerBtn.disabled = true;
+    registerBtn.textContent = 'جاري إنشاء الحساب...';
+
+
+    try {
+
+      /*
+       * إنشاء الحساب في Supabase Auth
+       */
+
+      const {
+        data,
+        error
+      } = await sb.auth.signUp({
+
+        email: email,
+
+        password: password,
+
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone
+          }
+        }
+
+      });
+
+
+      /* =========================
+         معالجة خطأ Supabase
+      ========================= */
+
+      if (error) {
+
+        console.error(
+          'Supabase Signup Error:',
+          error
+        );
+
+        /*
+         * أخطاء شائعة
+         */
+
+        const message =
+          String(error.message || '').toLowerCase();
+
+
+        if (
+          message.includes('user already registered') ||
+          message.includes('already registered') ||
+          message.includes('already exists')
+        ) {
+
+          zoma.toast(
+            'رقم الهاتف مستخدم بالفعل، جرّب تسجيل الدخول',
+            'error'
+          );
+
+          return;
+        }
+
+
+        if (
+          message.includes('invalid email')
+        ) {
+
+          zoma.toast(
+            'تعذر إنشاء البريد الداخلي للحساب',
+            'error'
+          );
+
+          return;
+        }
+
+
+        if (
+          message.includes('password')
+        ) {
+
+          zoma.toast(
+            'كلمة المرور غير صالحة',
+            'error'
+          );
+
+          return;
+        }
+
+
+        zoma.toast(
+          error.message || 'حدث خطأ أثناء إنشاء الحساب',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /* =========================
+         التأكد من إنشاء المستخدم
+      ========================= */
+
+      if (!data || !data.user) {
+
+        zoma.toast(
+          'تعذر إنشاء الحساب',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /*
+       * لو Supabase لم يعطِ Session
+       * فهذا غالبًا بسبب Email Confirmation.
+       */
+
+      if (!data.session) {
+
+        zoma.toast(
+          'تم إنشاء الحساب، لكن تأكيد البريد الإلكتروني مفعّل في Supabase. عطّله من إعدادات Auth حتى يتم الدخول مباشرة.',
+          'error'
+        );
+
+        return;
+      }
+
+
+      /* انتظار بسيط للتأكد من حفظ الجلسة */
+
+      await new Promise(function (resolve) {
+        setTimeout(resolve, 400);
+      });
+
+
+      /* نجاح */
+
+      zoma.toast(
+        'تم إنشاء الحساب بنجاح',
+        'success'
+      );
+
+
+      /* الانتقال للوحة العميل */
+
+      window.location.href =
+        'dashboard.html';
+
+
+    } catch (err) {
+
+      console.error(
+        'Unexpected Signup Error:',
+        err
+      );
+
+      zoma.toast(
+        err.message || 'حدث خطأ غير متوقع',
+        'error'
+      );
+
+    } finally {
+
+      registerBtn.disabled = false;
+      registerBtn.textContent = 'إنشاء الحساب';
+
+    }
+
+  });
+
+})();
+</script>
+
+</body>
+</html>

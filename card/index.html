@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>ZOMA Card</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/app.js"></script>
+</head>
+
+<body>
+
+<main class="section">
+
+  <div class="container">
+
+    <div id="loading" class="center muted">
+      جاري تحميل البطاقة…
+    </div>
+
+
+    <section
+      id="profile"
+      class="panel profile-card"
+      style="display:none"
+    >
+
+      <img
+        id="avatar"
+        class="avatar"
+        alt="صورة البطاقة"
+      >
+
+
+      <div
+        class="profile-name"
+        id="name"
+      ></div>
+
+
+      <div
+        class="muted"
+        id="cardid"
+      ></div>
+
+
+      <div
+        id="socials"
+        class="socials"
+      ></div>
+
+
+      <div
+        class="public-links"
+        id="links"
+      ></div>
+
+
+      <div
+        class="actions"
+        style="justify-content:center;margin-top:18px"
+      >
+
+        <button
+          class="btn"
+          id="save"
+          type="button"
+        >
+          حفظ جهة الاتصال
+        </button>
+
+        <button
+          class="btn"
+          id="share"
+          type="button"
+        >
+          مشاركة
+        </button>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<div id="toast" class="toast"></div>
+
+
+<script>
+(function () {
+
+  /* =========================
+     DOM Elements
+  ========================= */
+
+  const loadingEl =
+    document.getElementById('loading');
+
+  const profileEl =
+    document.getElementById('profile');
+
+  const avatarEl =
+    document.getElementById('avatar');
+
+  const nameEl =
+    document.getElementById('name');
+
+  const cardIdEl =
+    document.getElementById('cardid');
+
+  const socialsEl =
+    document.getElementById('socials');
+
+  const linksEl =
+    document.getElementById('links');
+
+  const saveBtn =
+    document.getElementById('save');
+
+  const shareBtn =
+    document.getElementById('share');
+
+
+  /* =========================
+     Card ID
+  ========================= */
+
+  const cardId =
+    new URLSearchParams(
+      window.location.search
+    ).get('id');
+
+
+  let publicCard = null;
+
+
+  /* =========================
+     صورة افتراضية
+  ========================= */
+
+  function getDefaultAvatar() {
+
+    const svg = `
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="240"
+        height="240"
+        viewBox="0 0 240 240"
+      >
+        <rect
+          width="100%"
+          height="100%"
+          rx="120"
+          fill="#171b22"
+        />
+
+        <text
+          x="50%"
+          y="54%"
+          text-anchor="middle"
+          fill="#e8c46a"
+          font-size="80"
+          font-family="Arial"
+        >
+          Z
+        </text>
+      </svg>
+    `;
+
+    return (
+      'data:image/svg+xml;charset=UTF-8,' +
+      encodeURIComponent(svg)
+    );
+  }
+
+
+  /* =========================
+     بناء الروابط
+  ========================= */
+
+  function renderSocials(card) {
+
+    const buttons = [];
+
+
+    if (card.facebook_url) {
+
+      buttons.push(`
+        <a
+          class="btn"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="${zoma.escape(card.facebook_url)}"
+        >
+          Facebook
+        </a>
+      `);
+
+    }
+
+
+    if (card.tiktok_url) {
+
+      buttons.push(`
+        <a
+          class="btn"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="${zoma.escape(card.tiktok_url)}"
+        >
+          TikTok
+        </a>
+      `);
+
+    }
+
+
+    if (card.whatsapp_1) {
+
+      buttons.push(`
+        <a
+          class="btn success"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="${zoma.wa(card.whatsapp_1)}"
+        >
+          WhatsApp
+        </a>
+      `);
+
+    }
+
+
+    if (
+      card.show_whatsapp_2 &&
+      card.whatsapp_2
+    ) {
+
+      buttons.push(`
+        <a
+          class="btn success"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="${zoma.wa(card.whatsapp_2)}"
+        >
+          WhatsApp 2
+        </a>
+      `);
+
+    }
+
+
+    socialsEl.innerHTML =
+      buttons.join('');
+
+
+    linksEl.innerHTML =
+      buttons.length
+        ? ''
+        : '<div class="muted">لا توجد روابط عامة مضافة.</div>';
+  }
+
+
+  /* =========================
+     تحميل البطاقة
+  ========================= */
+
+  async function boot() {
+
+    if (!cardId) {
+
+      loadingEl.textContent =
+        'رابط البطاقة غير صحيح';
+
+      return;
+    }
+
+
+    try {
+
+      const {
+        data,
+        error
+      } = await sb.rpc(
+        'zoma_get_public_card',
+        {
+          p_card_id: cardId
+        }
+      );
+
+
+      if (error) {
+
+        console.error(
+          'Public Card Error:',
+          error
+        );
+
+        loadingEl.textContent =
+          'تعذر تحميل البطاقة';
+
+        return;
+      }
+
+
+      if (!data || !data[0]) {
+
+        loadingEl.textContent =
+          'البطاقة غير موجودة';
+
+        return;
+      }
+
+
+      const card = data[0];
+
+      publicCard = card;
+
+
+      /* =========================
+         حالات البطاقة
+      ========================= */
+
+      if (card.status === 'suspended') {
+
+        loadingEl.textContent =
+          'هذه البطاقة موقوفة';
+
+        return;
+      }
+
+
+      if (card.status === 'unactivated') {
+
+        window.location.href =
+          '../activation.html?id=' +
+          encodeURIComponent(cardId);
+
+        return;
+      }
+
+
+      /* =========================
+         عرض البيانات
+      ========================= */
+
+      nameEl.textContent =
+        card.full_name || 'ZOMA User';
+
+
+      cardIdEl.textContent =
+        card.card_id || '';
+
+
+      avatarEl.src =
+        card.photo_url ||
+        getDefaultAvatar();
+
+
+      avatarEl.onerror =
+        function () {
+          avatarEl.src =
+            getDefaultAvatar();
+        };
+
+
+      renderSocials(card);
+
+
+      /* =========================
+         إظهار البطاقة
+      ========================= */
+
+      loadingEl.style.display =
+        'none';
+
+      profileEl.style.display =
+        'block';
+
+
+      /* =========================
+         Analytics
+      ========================= */
+
+      if (
+        card.card_uuid &&
+        sb
+      ) {
+
+        const {
+          error: analyticsError
+        } = await sb
+          .from('analytics')
+          .insert({
+            card_id: card.card_uuid,
+            event_type: 'profile_view',
+            source: 'link',
+            metadata: {
+              card_id: cardId
+            }
+          });
+
+
+        if (analyticsError) {
+
+          console.warn(
+            'Analytics Error:',
+            analyticsError
+          );
+
+        }
+
+      }
+
+
+    } catch (err) {
+
+      console.error(
+        'Card Boot Error:',
+        err
+      );
+
+      loadingEl.textContent =
+        err.message ||
+        'حدث خطأ أثناء تحميل البطاقة';
+
+    }
+
+  }
+
+
+  /* =========================
+     حفظ جهة الاتصال
+  ========================= */
+
+  saveBtn.addEventListener(
+    'click',
+    function () {
+
+      if (!publicCard) {
+
+        zoma.toast(
+          'بيانات البطاقة غير جاهزة',
+          'error'
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const fileName =
+          (
+            publicCard.full_name ||
+            'ZOMA'
+          ) + '.vcf';
+
+
+        zoma.download(
+          fileName,
+          zoma.vcard(publicCard)
+        );
+
+
+      } catch (err) {
+
+        console.error(
+          'VCard Error:',
+          err
+        );
+
+        zoma.toast(
+          'تعذر حفظ جهة الاتصال',
+          'error'
+        );
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     مشاركة البطاقة
+  ========================= */
+
+  shareBtn.addEventListener(
+    'click',
+    async function () {
+
+      if (!publicCard) {
+
+        zoma.toast(
+          'بيانات البطاقة غير جاهزة',
+          'error'
+        );
+
+        return;
+      }
+
+
+      try {
+
+        if (
+          navigator.share
+        ) {
+
+          await navigator.share({
+
+            title:
+              'ZOMA Smart Card',
+
+            text:
+              publicCard.full_name ||
+              'ZOMA Card',
+
+            url:
+              window.location.href
+
+          });
+
+          return;
+        }
+
+
+        throw new Error(
+          'Share API unavailable'
+        );
+
+
+      } catch (err) {
+
+        try {
+
+          if (
+            navigator.clipboard &&
+            navigator.clipboard.writeText
+          ) {
+
+            await navigator.clipboard.writeText(
+              window.location.href
+            );
+
+            zoma.toast(
+              'تم نسخ رابط البطاقة',
+              'success'
+            );
+
+          }
+
+        } catch (clipboardError) {
+
+          console.error(
+            'Clipboard Error:',
+            clipboardError
+          );
+
+          zoma.toast(
+            'تعذر مشاركة الرابط',
+            'error'
+          );
+
+        }
+
+      }
+
+    }
+  );
+
+
+  /* =========================
+     تشغيل
+  ========================= */
+
+  boot();
+
+})();
+</script>
+
+</body>
+</html>

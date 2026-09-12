@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>دخول العميل | ZOMA</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/app.js"></script>
+</head>
+
+<body>
+
+<div class="auth-wrap">
+  <div class="panel auth">
+
+    <a class="brand" href="../index.html">
+      <span class="brand-badge">Z</span>
+      ZOMA
+    </a>
+
+    <h1>تسجيل دخول العميل</h1>
+
+    <p class="muted">
+      يمكنك الدخول برقم الهاتف أو رقم البطاقة أو البريد الداخلي للحساب.
+    </p>
+
+    <form id="f" class="form">
+
+      <div class="field">
+        <label for="identity">
+          الهاتف / رقم البطاقة / البريد
+        </label>
+
+        <input
+          id="identity"
+          type="text"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="password">
+          كلمة المرور
+        </label>
+
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button
+        id="loginBtn"
+        class="btn primary"
+        type="submit"
+      >
+        دخول
+      </button>
+
+    </form>
+
+    <div class="help">
+      ليس لديك حساب؟
+      <a class="link" href="register.html">إنشاء حساب</a>
+    </div>
+
+    <div class="help">
+      <a class="link" href="../index.html">
+        العودة للرئيسية
+      </a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function () {
+
+  const form = document.getElementById('f');
+  const identityInput = document.getElementById('identity');
+  const passwordInput = document.getElementById('password');
+  const loginBtn = document.getElementById('loginBtn');
+
+  form.addEventListener('submit', async function (e) {
+
+    e.preventDefault();
+
+    const identity = identityInput.value.trim();
+    const password = passwordInput.value;
+
+    if (!identity || !password) {
+      zoma.toast('من فضلك أدخل بيانات الدخول', 'error');
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'جاري الدخول...';
+
+    try {
+
+      let email = identity;
+
+      /*
+       * لو المستخدم كتب رقم الهاتف أو رقم البطاقة
+       * نحاول الحصول على البريد الداخلي للحساب
+       */
+      if (!identity.includes('@')) {
+
+        const {
+          data,
+          error
+        } = await sb.rpc(
+          'zoma_get_login_email',
+          {
+            p_identity: identity
+          }
+        );
+
+        if (error) {
+          console.error('Login RPC Error:', error);
+
+          zoma.toast(
+            'تعذر التحقق من بيانات الدخول',
+            'error'
+          );
+
+          return;
+        }
+
+        if (!data) {
+          zoma.toast(
+            'رقم الهاتف أو رقم البطاقة غير صحيح',
+            'error'
+          );
+
+          return;
+        }
+
+        email = data;
+      }
+
+      /*
+       * تسجيل الدخول من خلال Supabase Auth
+       */
+      const {
+        data: loginData,
+        error: loginError
+      } = await sb.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (loginError) {
+
+        console.error(
+          'Supabase Login Error:',
+          loginError
+        );
+
+        /*
+         * رسائل أوضح للمستخدم
+         */
+        if (
+          loginError.message &&
+          loginError.message.toLowerCase().includes('invalid login')
+        ) {
+          zoma.toast(
+            'بيانات الدخول غير صحيحة',
+            'error'
+          );
+        } else {
+          zoma.toast(
+            loginError.message || 'حدث خطأ أثناء تسجيل الدخول',
+            'error'
+          );
+        }
+
+        return;
+      }
+
+      if (!loginData || !loginData.user) {
+        zoma.toast(
+          'تعذر تسجيل الدخول',
+          'error'
+        );
+
+        return;
+      }
+
+      zoma.toast(
+        'تم تسجيل الدخول بنجاح',
+        'success'
+      );
+
+      /*
+       * الانتقال إلى لوحة العميل
+       */
+      window.location.href = 'dashboard.html';
+
+    } catch (err) {
+
+      console.error(
+        'Unexpected Login Error:',
+        err
+      );
+
+      zoma.toast(
+        err.message || 'حدث خطأ غير متوقع',
+        'error'
+      );
+
+    } finally {
+
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'دخول';
+
+    }
+
+  });
+
+})();
+</script>
+
+</body>
+</html>

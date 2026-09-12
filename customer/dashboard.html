@@ -1,0 +1,2222 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>لوحة العميل | ZOMA</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/app.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="container nav">
+
+    <a class="brand" href="../index.html">
+      <span class="brand-badge">Z</span>
+      ZOMA
+    </a>
+
+    <div class="nav-actions">
+
+      <a class="btn primary" href="order.html">
+        طلب بطاقة
+      </a>
+
+      <button
+        class="btn"
+        id="logout"
+        type="button"
+      >
+        خروج
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="section">
+
+  <div class="container">
+
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+
+    <div class="dash-top">
+
+      <div>
+
+        <h1>
+          أهلاً
+          <span id="hello"></span>
+          👋
+        </h1>
+
+        <p class="muted">
+          إدارة بياناتك وبطاقاتك وطلباتك.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         PROFILE + CARDS
+    ========================== -->
+
+    <div class="two-col">
+
+
+      <!-- =========================
+           PROFILE
+      ========================== -->
+
+      <section class="panel order-card">
+
+        <h2>
+          بيانات الملف
+        </h2>
+
+        <p class="muted">
+          يمكنك تعديل بياناتك في أي وقت.
+        </p>
+
+
+        <form
+          id="profileForm"
+          class="form"
+        >
+
+          <div class="field">
+
+            <label for="full_name">
+              الاسم
+            </label>
+
+            <input
+              id="full_name"
+              autocomplete="name"
+              required
+            >
+
+          </div>
+
+
+          <div class="grid-2">
+
+            <div class="field">
+
+              <label for="facebook_url">
+                Facebook
+              </label>
+
+              <input
+                id="facebook_url"
+                type="url"
+                placeholder="رابط Facebook"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="tiktok_url">
+                TikTok
+              </label>
+
+              <input
+                id="tiktok_url"
+                type="url"
+                placeholder="رابط TikTok"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="whatsapp_1">
+                WhatsApp 1
+              </label>
+
+              <input
+                id="whatsapp_1"
+                type="tel"
+              >
+
+            </div>
+
+
+            <div class="field">
+
+              <label for="whatsapp_2">
+                WhatsApp 2
+              </label>
+
+              <input
+                id="whatsapp_2"
+                type="tel"
+              >
+
+            </div>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="show_whatsapp_2">
+              إظهار واتساب 2
+            </label>
+
+            <select
+              id="show_whatsapp_2"
+            >
+
+              <option value="true">
+                نعم
+              </option>
+
+              <option value="false">
+                لا
+              </option>
+
+            </select>
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="photo">
+              الصورة
+            </label>
+
+            <input
+              id="photo"
+              type="file"
+              accept="image/*"
+            >
+
+          </div>
+
+
+          <div
+            id="profileCardHint"
+            class="notice-box"
+          >
+            سيتم ربط هذه البيانات بالبطاقة بعد إصدارها.
+          </div>
+
+
+          <button
+            class="btn primary"
+            id="saveProfileBtn"
+            type="submit"
+          >
+            حفظ التعديلات
+          </button>
+
+        </form>
+
+      </section>
+
+
+      <!-- =========================
+           CARDS
+      ========================== -->
+
+      <section class="panel order-card">
+
+        <div class="toolbar">
+
+          <h2>
+            بطاقاتي
+          </h2>
+
+        </div>
+
+
+        <div id="cards"></div>
+
+      </section>
+
+    </div>
+
+
+    <!-- =========================
+         MESSAGES
+    ========================== -->
+
+    <section
+      class="panel order-card"
+      style="margin-top:16px"
+    >
+
+      <h2>
+        تواصل مع ZOMA
+      </h2>
+
+
+      <form
+        id="msgForm"
+        class="form"
+      >
+
+        <div class="field">
+
+          <label for="msgSubject">
+            الموضوع
+          </label>
+
+          <input
+            id="msgSubject"
+            required
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="msgBody">
+            الرسالة
+          </label>
+
+          <textarea
+            id="msgBody"
+            rows="4"
+            required
+          ></textarea>
+
+        </div>
+
+
+        <button
+          class="btn primary"
+          type="submit"
+        >
+          إرسال
+        </button>
+
+      </form>
+
+
+      <div
+        id="myMessages"
+        style="margin-top:16px"
+      ></div>
+
+    </section>
+
+
+    <!-- =========================
+         ORDERS
+    ========================== -->
+
+    <section
+      class="panel order-card"
+      style="margin-top:16px"
+    >
+
+      <div class="toolbar">
+
+        <h2>
+          طلباتي
+        </h2>
+
+        <a
+          class="btn"
+          href="order.html"
+        >
+          طلب جديد
+        </a>
+
+      </div>
+
+
+      <div id="orders"></div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<script>
+
+(function () {
+
+  'use strict';
+
+
+  /* =========================================================
+     DOM REFERENCES
+  ========================================================= */
+
+  const logoutBtn =
+    document.getElementById('logout');
+
+  const helloEl =
+    document.getElementById('hello');
+
+  const profileFormEl =
+    document.getElementById('profileForm');
+
+  const fullNameEl =
+    document.getElementById('full_name');
+
+  const facebookUrlEl =
+    document.getElementById('facebook_url');
+
+  const tiktokUrlEl =
+    document.getElementById('tiktok_url');
+
+  const whatsapp1El =
+    document.getElementById('whatsapp_1');
+
+  const whatsapp2El =
+    document.getElementById('whatsapp_2');
+
+  const showWhatsapp2El =
+    document.getElementById('show_whatsapp_2');
+
+  const photoEl =
+    document.getElementById('photo');
+
+  const profileCardHintEl =
+    document.getElementById('profileCardHint');
+
+  const saveProfileBtn =
+    document.getElementById('saveProfileBtn');
+
+  const cardsEl =
+    document.getElementById('cards');
+
+  const msgFormEl =
+    document.getElementById('msgForm');
+
+  const msgSubjectEl =
+    document.getElementById('msgSubject');
+
+  const msgBodyEl =
+    document.getElementById('msgBody');
+
+  const myMessagesEl =
+    document.getElementById('myMessages');
+
+  const ordersEl =
+    document.getElementById('orders');
+
+
+  /* =========================================================
+     DATA
+  ========================================================= */
+
+  let user = null;
+
+  let cardRows = [];
+
+  let orderRows = [];
+
+
+  /* =========================================================
+     HELPERS
+  ========================================================= */
+
+  function escapeHtml(value) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.escape === 'function'
+    ) {
+
+      return window.zoma.escape(
+        value == null
+          ? ''
+          : String(value)
+      );
+
+    }
+
+
+    const div =
+      document.createElement('div');
+
+    div.textContent =
+      value == null
+        ? ''
+        : String(value);
+
+    return div.innerHTML;
+  }
+
+
+  function money(value) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.money === 'function'
+    ) {
+
+      return window.zoma.money(value);
+    }
+
+
+    return (
+      Number(value || 0)
+        .toLocaleString('ar-EG') +
+      ' جنيه'
+    );
+  }
+
+
+  function statusLabel(status) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.statusLabel === 'function'
+    ) {
+
+      return window.zoma.statusLabel(status);
+    }
+
+
+    const labels = {
+
+      pending:
+        'قيد المراجعة',
+
+      confirmed:
+        'تم التأكيد',
+
+      preparing:
+        'جاري التجهيز',
+
+      ready:
+        'جاهز',
+
+      shipped:
+        'تم الشحن',
+
+      delivered:
+        'تم التسليم',
+
+      rejected:
+        'مرفوض',
+
+      active:
+        'نشطة',
+
+      suspended:
+        'موقوفة',
+
+      unactivated:
+        'غير مفعلة'
+
+    };
+
+
+    return (
+      labels[status] ||
+      status ||
+      '—'
+    );
+
+  }
+
+
+  function statusClass(status) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.statusClass === 'function'
+    ) {
+
+      return window.zoma.statusClass(status);
+    }
+
+
+    return status || '';
+
+  }
+
+
+  function toast(message, type) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.toast === 'function'
+    ) {
+
+      window.zoma.toast(
+        message,
+        type
+      );
+
+    } else {
+
+      console.log(
+        message
+      );
+
+    }
+
+  }
+
+
+  function getDesignImage(design) {
+
+    if (!design) {
+      return '';
+    }
+
+
+    return (
+      design.preview_url || ''
+    );
+
+  }
+
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  logoutBtn.addEventListener(
+    'click',
+    async function () {
+
+      try {
+
+        if (
+          window.zoma &&
+          typeof window.zoma.signOut === 'function'
+        ) {
+
+          await window.zoma.signOut();
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          'Logout Error:',
+          error
+        );
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     LOAD CUSTOMER
+  ========================================================= */
+
+  async function loadCustomer() {
+
+    const result =
+      await sb
+        .from('customers')
+        .select('*')
+        .eq(
+          'id',
+          user.id
+        )
+        .maybeSingle();
+
+
+    if (result.error) {
+
+      console.error(
+        'Customer Error:',
+        result.error
+      );
+
+      return null;
+    }
+
+
+    return result.data || null;
+
+  }
+
+
+  /* =========================================================
+     LOAD CARDS
+  ========================================================= */
+
+  async function loadCards() {
+
+    const result =
+      await sb
+        .from('cards')
+        .select(
+          `
+          *,
+          orders(
+            order_number,
+            status,
+            total_price,
+            designs(
+              name,
+              design_code,
+              preview_url,
+              design_type,
+              template_config
+            )
+          ),
+          profiles(*)
+          `
+        )
+        .eq(
+          'customer_id',
+          user.id
+        )
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        );
+
+
+    /*
+     * لو استعلام التصميم بالصورة فشل لأن أعمدة
+     * الصور غير موجودة في قاعدة البيانات،
+     * نعيد الاستعلام بدون أعمدة الصور.
+     */
+
+    if (result.error) {
+
+      console.warn(
+        'Cards query with preview fields failed:',
+        result.error
+      );
+
+
+      const fallback =
+        await sb
+          .from('cards')
+          .select(
+            `
+            *,
+            orders(
+              order_number,
+              status,
+              total_price,
+              designs(name)
+            ),
+            profiles(*)
+            `
+          )
+          .eq(
+            'customer_id',
+            user.id
+          )
+          .order(
+            'created_at',
+            {
+              ascending: false
+            }
+          );
+
+
+      if (fallback.error) {
+
+        console.error(
+          'Cards fallback error:',
+          fallback.error
+        );
+
+        return [];
+
+      }
+
+
+      return fallback.data || [];
+
+    }
+
+
+    return result.data || [];
+
+  }
+
+
+  /* =========================================================
+     LOAD ORDERS
+  ========================================================= */
+
+  async function loadOrders() {
+
+    const result =
+      await sb
+        .from('orders')
+        .select(
+          `
+          *,
+          designs(
+            name,
+            preview_url,
+            template_config
+          )
+          `
+        )
+        .eq(
+          'customer_id',
+          user.id
+        )
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        );
+
+
+    if (result.error) {
+
+      console.warn(
+        'Orders query with preview fields failed:',
+        result.error
+      );
+
+
+      const fallback =
+        await sb
+          .from('orders')
+          .select(
+            `
+            *,
+            designs(name)
+            `
+          )
+          .eq(
+            'customer_id',
+            user.id
+          )
+          .order(
+            'created_at',
+            {
+              ascending: false
+            }
+          );
+
+
+      if (fallback.error) {
+
+        console.error(
+          'Orders fallback error:',
+          fallback.error
+        );
+
+        return [];
+
+      }
+
+
+      return fallback.data || [];
+
+    }
+
+
+    return result.data || [];
+
+  }
+
+
+  /* =========================================================
+     LOAD MESSAGES
+  ========================================================= */
+
+  async function loadMessages() {
+
+    const result =
+      await sb
+        .from('messages')
+        .select('*')
+        .eq(
+          'customer_id',
+          user.id
+        )
+        .order(
+          'created_at',
+          {
+            ascending: false
+          }
+        );
+
+
+    if (result.error) {
+
+      console.error(
+        'Messages Error:',
+        result.error
+      );
+
+      return [];
+
+    }
+
+
+    return result.data || [];
+
+  }
+
+
+  /* =========================================================
+     LOAD PROFILE DATA
+  ========================================================= */
+
+  function loadProfileIntoForm(
+    customer,
+    cards
+  ) {
+
+    /*
+     * أولاً نضع بيانات العميل الأساسية.
+     */
+
+    fullNameEl.value =
+      customer?.full_name || '';
+
+
+    helloEl.textContent =
+      customer?.full_name || '';
+
+
+    /*
+     * نحاول أخذ أحدث Profile موجود.
+     */
+
+    let profile = null;
+
+
+    for (
+      let i = 0;
+      i < cards.length;
+      i++
+    ) {
+
+      if (
+        cards[i] &&
+        cards[i].profiles
+      ) {
+
+        if (
+          Array.isArray(
+            cards[i].profiles
+          )
+        ) {
+
+          if (
+            cards[i].profiles.length
+          ) {
+
+            profile =
+              cards[i].profiles[0];
+
+            break;
+
+          }
+
+        } else {
+
+          profile =
+            cards[i].profiles;
+
+          if (profile) {
+            break;
+          }
+
+        }
+
+      }
+
+    }
+
+
+    /*
+     * لو يوجد Profile، نعوض به بيانات الفورم.
+     */
+
+    if (profile) {
+
+      fullNameEl.value =
+        profile.full_name ||
+        fullNameEl.value ||
+        '';
+
+
+      facebookUrlEl.value =
+        profile.facebook_url ||
+        '';
+
+
+      tiktokUrlEl.value =
+        profile.tiktok_url ||
+        '';
+
+
+      whatsapp1El.value =
+        profile.whatsapp_1 ||
+        '';
+
+
+      whatsapp2El.value =
+        profile.whatsapp_2 ||
+        '';
+
+
+      showWhatsapp2El.value =
+        String(
+          profile.show_whatsapp_2 !== false
+        );
+
+
+      profileCardHintEl.textContent =
+        'بياناتك مرتبطة بالبطاقة الحالية ويمكنك تعديلها في أي وقت.';
+
+    } else {
+
+      profileCardHintEl.textContent =
+        cards.length
+          ? 'سيتم حفظ البيانات على البطاقة الحالية.'
+          : 'يمكنك حفظ الاسم الآن، وسيتم ربط باقي بيانات البطاقة عند إصدار البطاقة.';
+
+    }
+
+  }
+
+
+  /* =========================================================
+     RENDER CARDS
+  ========================================================= */
+
+  function renderCards() {
+
+    if (!cardRows.length) {
+
+      cardsEl.innerHTML = `
+
+        <div class="empty">
+
+          <p>
+            لا توجد بطاقات حتى الآن.
+          </p>
+
+          <a
+            class="btn primary"
+            href="order.html"
+            style="margin-top:10px"
+          >
+            طلب بطاقة جديدة
+          </a>
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    cardsEl.innerHTML =
+      cardRows
+        .map(
+          function (card) {
+
+            const order =
+              card.orders || null;
+
+
+            const design =
+              order?.designs || null;
+
+
+            const designImage =
+              getDesignImage(
+                design
+              );
+
+
+            return `
+
+              <div
+                class="notice-box"
+                style="
+                  margin-bottom:12px;
+                  overflow:hidden;
+                "
+              >
+
+
+                ${
+                  designImage
+
+                    ? `
+                      <div
+                        style="
+                          margin-bottom:12px;
+                          text-align:center;
+                        "
+                      >
+
+                        <img
+                          src="${escapeHtml(
+                            designImage
+                          )}"
+                          alt="معاينة التصميم"
+                          style="
+                            width:100%;
+                            max-height:220px;
+                            object-fit:contain;
+                            border-radius:12px;
+                            background:#fff;
+                          "
+                        >
+
+                      </div>
+                    `
+
+                    : ''
+                }
+
+
+                <div>
+
+                  <b>
+                    ${escapeHtml(
+                      card.card_id ||
+                      'بطاقة'
+                    )}
+                  </b>
+
+                </div>
+
+
+                <div
+                  class="muted"
+                  style="margin-top:5px"
+                >
+
+                  الحالة:
+
+                  ${escapeHtml(
+                    statusLabel(
+                      card.status
+                    )
+                  )}
+
+                </div>
+
+
+                ${
+                  design?.name
+
+                    ? `
+                      <div
+                        class="muted"
+                        style="margin-top:5px"
+                      >
+                        التصميم:
+                        ${escapeHtml(
+                          design.name
+                        )}
+                      </div>
+                    `
+
+                    : ''
+                }
+
+
+                <div
+                  class="actions"
+                  style="margin-top:12px"
+                >
+
+                  ${
+                    card.public_url
+
+                      ? `
+                        <a
+                          class="btn primary"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href="${escapeHtml(
+                            card.public_url
+                          )}"
+                        >
+                          فتح البطاقة
+                        </a>
+                      `
+
+                      : ''
+                  }
+
+
+                  ${
+                    card.public_url
+
+                      ? `
+                        <button
+                          class="btn"
+                          type="button"
+                          data-copy-card="${escapeHtml(
+                            card.id
+                          )}"
+                        >
+                          نسخ الرابط
+                        </button>
+                      `
+
+                      : ''
+                  }
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+
+
+    document
+      .querySelectorAll(
+        '[data-copy-card]'
+      )
+      .forEach(
+        function (button) {
+
+          button.addEventListener(
+            'click',
+            function () {
+
+              copyCardUrl(
+                button.dataset.copyCard
+              );
+
+            }
+          );
+
+        }
+      );
+
+  }
+
+
+  /* =========================================================
+     COPY CARD URL
+  ========================================================= */
+
+  async function copyCardUrl(id) {
+
+    const card =
+      cardRows.find(
+        function (item) {
+          return item.id === id;
+        }
+      );
+
+
+    if (
+      !card ||
+      !card.public_url
+    ) {
+
+      toast(
+        'رابط البطاقة غير متوفر',
+        'error'
+      );
+
+      return;
+    }
+
+
+    try {
+
+      if (
+        navigator.clipboard &&
+        navigator.clipboard.writeText
+      ) {
+
+        await navigator.clipboard.writeText(
+          card.public_url
+        );
+
+      } else {
+
+        const temp =
+          document.createElement(
+            'textarea'
+          );
+
+        temp.value =
+          card.public_url;
+
+        document.body.appendChild(
+          temp
+        );
+
+        temp.select();
+
+        document.execCommand(
+          'copy'
+        );
+
+        temp.remove();
+
+      }
+
+
+      toast(
+        'تم نسخ الرابط',
+        'success'
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        error
+      );
+
+      toast(
+        'تعذر نسخ الرابط',
+        'error'
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     RENDER ORDERS
+  ========================================================= */
+
+  function renderOrders() {
+
+    if (!orderRows.length) {
+
+      ordersEl.innerHTML = `
+
+        <div class="empty">
+
+          لا توجد طلبات.
+
+          <div
+            style="margin-top:10px"
+          >
+
+            <a
+              class="btn primary"
+              href="order.html"
+            >
+              إنشاء أول طلب
+            </a>
+
+          </div>
+
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    ordersEl.innerHTML =
+      orderRows
+        .map(
+          function (order) {
+
+            const design =
+              order.designs || null;
+
+
+            const designImage =
+              getDesignImage(
+                design
+              );
+
+
+            return `
+
+              <div
+                class="notice-box"
+                style="
+                  margin-bottom:12px;
+                "
+              >
+
+
+                <div
+                  style="
+                    display:flex;
+                    gap:14px;
+                    align-items:flex-start;
+                    flex-wrap:wrap;
+                  "
+                >
+
+
+                  ${
+                    designImage
+
+                      ? `
+                        <div
+                          style="
+                            width:150px;
+                            flex:0 0 150px;
+                          "
+                        >
+
+                          <img
+                            src="${escapeHtml(
+                              designImage
+                            )}"
+                            alt="معاينة التصميم"
+                            style="
+                              width:150px;
+                              height:150px;
+                              object-fit:cover;
+                              border-radius:12px;
+                              background:#fff;
+                            "
+                          >
+
+                        </div>
+                      `
+
+                      : `
+                        <div
+                          style="
+                            width:150px;
+                            height:150px;
+                            flex:0 0 150px;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            border-radius:12px;
+                            border:1px solid rgba(255,255,255,.08);
+                          "
+                        >
+
+                          <span class="muted">
+                            لا توجد معاينة
+                          </span>
+
+                        </div>
+                      `
+                  }
+
+
+                  <div
+                    style="
+                      flex:1;
+                      min-width:220px;
+                    "
+                  >
+
+                    <div
+                      style="
+                        font-weight:700;
+                        font-size:17px;
+                      "
+                    >
+
+                      ${escapeHtml(
+                        order.order_number ||
+                        'طلب'
+                      )}
+
+                    </div>
+
+
+                    <div
+                      class="muted"
+                      style="margin-top:6px"
+                    >
+
+                      التصميم:
+
+                      ${escapeHtml(
+                        design?.name ||
+                        '—'
+                      )}
+
+                    </div>
+
+
+                    <div
+                      style="margin-top:7px"
+                    >
+
+                      السعر:
+
+                      <b>
+                        ${money(
+                          order.total_price
+                        )}
+                      </b>
+
+                    </div>
+
+
+                    <div
+                      style="margin-top:7px"
+                    >
+
+                      الحالة:
+
+                      <span
+                        class="status ${statusClass(
+                          order.status
+                        )}"
+                      >
+                        ${escapeHtml(
+                          statusLabel(
+                            order.status
+                          )
+                        )}
+                      </span>
+
+                    </div>
+
+
+                    ${
+                      order.admin_notes
+
+                        ? `
+                          <div
+                            class="muted"
+                            style="
+                              margin-top:9px;
+                            "
+                          >
+
+                            ملاحظات الإدارة:
+
+                            ${escapeHtml(
+                              order.admin_notes
+                            )}
+
+                          </div>
+                        `
+
+                        : ''
+                    }
+
+
+                    ${
+                      order.created_at
+
+                        ? `
+                          <div
+                            class="muted"
+                            style="
+                              margin-top:9px;
+                              font-size:13px;
+                            "
+                          >
+                            تاريخ الطلب:
+                            ${new Date(
+                              order.created_at
+                            ).toLocaleString(
+                              'ar-EG'
+                            )}
+                          </div>
+                        `
+
+                        : ''
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+  /* =========================================================
+     RENDER MESSAGES
+  ========================================================= */
+
+  function renderMessages(
+    messageRows
+  ) {
+
+    if (!messageRows.length) {
+
+      myMessagesEl.innerHTML = `
+
+        <div class="muted">
+          لا توجد رسائل.
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    myMessagesEl.innerHTML =
+      messageRows
+        .map(
+          function (message) {
+
+            const subject =
+              escapeHtml(
+                message.subject ||
+                'بدون موضوع'
+              );
+
+
+            const body =
+              escapeHtml(
+                message.body ||
+                ''
+              );
+
+
+            const reply =
+              escapeHtml(
+                message.admin_reply ||
+                'بانتظار الرد'
+              );
+
+
+            return `
+
+              <div
+                class="notice-box"
+                style="
+                  margin-bottom:8px;
+                "
+              >
+
+                <b>
+                  ${subject}
+                </b>
+
+                <div
+                  style="margin-top:6px"
+                >
+                  ${body}
+                </div>
+
+                <div
+                  class="muted"
+                  style="
+                    margin-top:8px;
+                  "
+                >
+
+                  الرد:
+
+                  ${reply}
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+  /* =========================================================
+     SAVE PROFILE
+  ========================================================= */
+
+  profileFormEl.addEventListener(
+    'submit',
+    async function (event) {
+
+      event.preventDefault();
+
+
+      if (!user) {
+
+        toast(
+          'يجب تسجيل الدخول أولًا',
+          'error'
+        );
+
+        return;
+      }
+
+
+      saveProfileBtn.disabled =
+        true;
+
+      saveProfileBtn.textContent =
+        'جاري الحفظ...';
+
+
+      try {
+
+        /* =========================
+           بيانات المستخدم
+        ========================= */
+
+        const fullName =
+          fullNameEl.value.trim();
+
+        const facebook =
+          facebookUrlEl.value.trim();
+
+        const tiktok =
+          tiktokUrlEl.value.trim();
+
+        const whatsapp1 =
+          whatsapp1El.value.trim();
+
+        const whatsapp2 =
+          whatsapp2El.value.trim();
+
+        const showWhatsapp2 =
+          showWhatsapp2El.value === 'true';
+
+
+        if (!fullName) {
+
+          toast(
+            'اكتب الاسم أولًا',
+            'error'
+          );
+
+          return;
+        }
+
+
+        /* =========================
+           تحديث customers
+        ========================= */
+
+        const customerResult =
+          await sb
+            .from('customers')
+            .update({
+              full_name:
+                fullName
+            })
+            .eq(
+              'id',
+              user.id
+            );
+
+
+        if (
+          customerResult.error
+        ) {
+
+          console.error(
+            'Customer Update Error:',
+            customerResult.error
+          );
+
+
+          toast(
+            customerResult.error.message,
+            'error'
+          );
+
+          return;
+        }
+
+
+        /* =========================
+           الصورة
+        ========================= */
+
+        let photoUrl =
+          null;
+
+
+        const file =
+          photoEl.files &&
+          photoEl.files[0];
+
+
+        if (file) {
+
+          if (
+            !window.zoma ||
+            typeof window.zoma.uploadPhoto !==
+              'function'
+          ) {
+
+            toast(
+              'رفع الصور غير متاح في app.js',
+              'error'
+            );
+
+            return;
+          }
+
+
+          photoUrl =
+            await window.zoma.uploadPhoto(
+              file
+            );
+
+        }
+
+
+        /* =========================
+           هل توجد بطاقة؟
+        ========================= */
+
+        const cardResult =
+          await sb
+            .from('cards')
+            .select(
+              'id,created_at'
+            )
+            .eq(
+              'customer_id',
+              user.id
+            )
+            .order(
+              'created_at',
+              {
+                ascending: false
+              }
+            )
+            .limit(1);
+
+
+        if (cardResult.error) {
+
+          console.error(
+            'Card lookup error:',
+            cardResult.error
+          );
+
+          /*
+           * حتى لو فشل البحث عن البطاقة،
+           * اسم العميل تم حفظه بالفعل.
+           */
+
+          toast(
+            'تم حفظ الاسم، لكن تعذر تحديث بيانات البطاقة',
+            'error'
+          );
+
+          return;
+        }
+
+
+        const currentCard =
+          cardResult.data &&
+          cardResult.data[0];
+
+
+        /* =========================
+           لا توجد بطاقة
+        ========================= */
+
+        if (!currentCard) {
+
+          /*
+           * لا يمكن تخزين Facebook/WhatsApp والصورة
+           * داخل profiles بدون card_id.
+           *
+           * لكن الاسم تم حفظه داخل customers.
+           */
+
+          profileCardHintEl.textContent =
+            'تم حفظ الاسم. سيتم ربط Facebook وTikTok وWhatsApp والصورة تلقائيًا عند إصدار البطاقة.';
+
+
+          toast(
+            'تم حفظ الاسم بنجاح',
+            'success'
+          );
+
+
+          return;
+        }
+
+
+        /* =========================
+           Profile Payload
+        ========================= */
+
+        const profilePayload = {
+
+          card_id:
+            currentCard.id,
+
+          full_name:
+            fullName,
+
+          facebook_url:
+            facebook,
+
+          tiktok_url:
+            tiktok,
+
+          whatsapp_1:
+            whatsapp1,
+
+          whatsapp_2:
+            whatsapp2,
+
+          show_whatsapp_2:
+            showWhatsapp2
+
+        };
+
+
+        if (photoUrl) {
+
+          profilePayload.photo_url =
+            photoUrl;
+
+        }
+
+
+        /* =========================
+           Upsert Profile
+        ========================= */
+
+        const profileResult =
+          await sb
+            .from('profiles')
+            .upsert(
+              profilePayload,
+              {
+                onConflict:
+                  'card_id'
+              }
+            );
+
+
+        if (
+          profileResult.error
+        ) {
+
+          console.error(
+            'Profile Upsert Error:',
+            profileResult.error
+          );
+
+
+          toast(
+            profileResult.error.message,
+            'error'
+          );
+
+          return;
+        }
+
+
+        profileCardHintEl.textContent =
+          'تم حفظ البيانات وربطها بالبطاقة بنجاح.';
+
+
+        helloEl.textContent =
+          fullName;
+
+
+        toast(
+          'تم حفظ البيانات بنجاح',
+          'success'
+        );
+
+
+        /*
+         * تحديث الشاشة
+         */
+
+        await refreshDashboard();
+
+
+      } catch (error) {
+
+        console.error(
+          'Save Profile Error:',
+          error
+        );
+
+
+        toast(
+          error.message ||
+          'حدث خطأ أثناء حفظ البيانات',
+          'error'
+        );
+
+      } finally {
+
+        saveProfileBtn.disabled =
+          false;
+
+        saveProfileBtn.textContent =
+          'حفظ التعديلات';
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     SEND MESSAGE
+  ========================================================= */
+
+  msgFormEl.addEventListener(
+    'submit',
+    async function (event) {
+
+      event.preventDefault();
+
+
+      if (!user) {
+        return;
+      }
+
+
+      const subject =
+        msgSubjectEl.value.trim();
+
+      const body =
+        msgBodyEl.value.trim();
+
+
+      if (!subject || !body) {
+
+        toast(
+          'اكتب الموضوع والرسالة أولًا',
+          'error'
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const result =
+          await sb
+            .from('messages')
+            .insert({
+
+              customer_id:
+                user.id,
+
+              subject:
+                subject,
+
+              body:
+                body
+
+            });
+
+
+        if (result.error) {
+
+          toast(
+            result.error.message,
+            'error'
+          );
+
+          return;
+        }
+
+
+        msgSubjectEl.value =
+          '';
+
+        msgBodyEl.value =
+          '';
+
+
+        toast(
+          'تم إرسال الرسالة',
+          'success'
+        );
+
+
+        const messages =
+          await loadMessages();
+
+
+        renderMessages(
+          messages
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          'Send Message Error:',
+          error
+        );
+
+
+        toast(
+          error.message ||
+          'حدث خطأ أثناء إرسال الرسالة',
+          'error'
+        );
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     REFRESH DASHBOARD
+  ========================================================= */
+
+  async function refreshDashboard() {
+
+    const [
+      customer,
+      cards,
+      orders,
+      messages
+    ] = await Promise.all([
+
+      loadCustomer(),
+
+      loadCards(),
+
+      loadOrders(),
+
+      loadMessages()
+
+    ]);
+
+
+    loadProfileIntoForm(
+      customer,
+      cards
+    );
+
+
+    cardRows =
+      cards;
+
+
+    orderRows =
+      orders;
+
+
+    renderCards();
+
+    renderOrders();
+
+    renderMessages(
+      messages
+    );
+
+  }
+
+
+  /* =========================================================
+     BOOT
+  ========================================================= */
+
+  async function boot() {
+
+    try {
+
+      if (
+        !window.zoma ||
+        typeof window.zoma.currentUser !==
+          'function'
+      ) {
+
+        console.error(
+          'app.js غير محمل بشكل صحيح.'
+        );
+
+        return;
+      }
+
+
+      user =
+        await window.zoma.currentUser();
+
+
+      if (!user) {
+
+        window.location.href =
+          'login.html';
+
+        return;
+      }
+
+
+      await refreshDashboard();
+
+
+    } catch (error) {
+
+      console.error(
+        'Customer Dashboard Error:',
+        error
+      );
+
+
+      toast(
+        error.message ||
+        'حدث خطأ أثناء تحميل لوحة العميل',
+        'error'
+      );
+
+    }
+
+  }
+
+
+  /* =========================================================
+     START
+  ========================================================= */
+
+  boot();
+
+})();
+</script>
+
+</body>
+</html>

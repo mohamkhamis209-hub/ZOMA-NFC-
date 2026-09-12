@@ -1,0 +1,1398 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <title>طلب بطاقة | ZOMA</title>
+
+  <link rel="stylesheet" href="../assets/css/style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/app.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+
+  <div class="container nav">
+
+    <a class="brand" href="dashboard.html">
+      <span class="brand-badge">Z</span>
+      ZOMA
+    </a>
+
+    <div class="nav-actions">
+
+      <a
+        class="btn"
+        href="dashboard.html"
+      >
+        لوحة العميل
+      </a>
+
+      <button
+        class="btn"
+        id="logout"
+        type="button"
+      >
+        خروج
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<main class="section">
+
+  <div class="container">
+
+    <div class="section-title">
+
+      <h2>
+        طلب بطاقة جديدة
+      </h2>
+
+      <p>
+        اختر التصميم وأدخل بيانات التوصيل.
+      </p>
+
+    </div>
+
+
+    <div class="two-col">
+
+
+      <!-- =====================================================
+           ORDER FORM
+      ====================================================== -->
+
+      <form
+        id="orderForm"
+        class="panel order-card form"
+      >
+
+        <!-- التصميمات -->
+
+        <div class="field">
+
+          <label for="design">
+            اختر تصميم البطاقة
+          </label>
+
+          <select
+            id="design"
+            required
+          >
+
+            <option value="">
+              جاري تحميل التصميمات...
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <!-- معاينة التصميم -->
+
+        <div
+          id="designPreviewBox"
+          class="notice-box"
+          style="
+            margin-bottom:16px;
+            display:none;
+          "
+        >
+
+          <div
+            id="designPreviewImageWrap"
+            style="
+              text-align:center;
+              margin-bottom:12px;
+            "
+          >
+
+            <img
+              id="designPreviewImage"
+              alt="معاينة التصميم"
+              style="
+                width:100%;
+                max-width:430px;
+                max-height:360px;
+                object-fit:contain;
+                border-radius:14px;
+                background:#fff;
+                display:none;
+              "
+            >
+
+          </div>
+
+
+          <div
+            id="designPreviewEmpty"
+            class="muted"
+            style="
+              text-align:center;
+              padding:30px 10px;
+              display:none;
+            "
+          >
+            لا توجد صورة معاينة لهذا التصميم.
+          </div>
+
+
+          <div
+            id="selectedDesignName"
+            style="
+              font-size:18px;
+              font-weight:700;
+            "
+          ></div>
+
+
+          <div
+            id="selectedDesignCode"
+            class="muted"
+            style="margin-top:5px"
+          ></div>
+
+
+          <div
+            id="selectedDesignPrice"
+            style="margin-top:8px"
+          ></div>
+
+        </div>
+
+
+        <!-- بيانات العميل -->
+
+        <div class="grid-2">
+
+
+          <div class="field">
+
+            <label for="name">
+              الاسم
+            </label>
+
+            <input
+              id="name"
+              type="text"
+              autocomplete="name"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="phone">
+              الهاتف
+            </label>
+
+            <input
+              id="phone"
+              type="tel"
+              inputmode="tel"
+              autocomplete="tel"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="gov">
+              المحافظة
+            </label>
+
+            <input
+              id="gov"
+              type="text"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="city">
+              المدينة
+            </label>
+
+            <input
+              id="city"
+              type="text"
+              required
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- العنوان -->
+
+        <div class="field">
+
+          <label for="address">
+            العنوان بالتفصيل
+          </label>
+
+          <textarea
+            id="address"
+            rows="4"
+            required
+          ></textarea>
+
+        </div>
+
+
+        <!-- ملاحظات -->
+
+        <div class="field">
+
+          <label for="notes">
+            ملاحظات
+          </label>
+
+          <textarea
+            id="notes"
+            rows="3"
+            placeholder="أي ملاحظات خاصة بالطلب"
+          ></textarea>
+
+        </div>
+
+
+        <!-- السعر -->
+
+        <div
+          class="notice-box"
+          id="price"
+        >
+          السعر: —
+        </div>
+
+
+        <!-- زر الإرسال -->
+
+        <button
+          class="btn primary"
+          id="submitBtn"
+          type="submit"
+        >
+          إرسال الطلب
+        </button>
+
+      </form>
+
+
+      <!-- =====================================================
+           INFO
+      ====================================================== -->
+
+      <div class="panel order-card">
+
+        <h3>
+          قبل الإرسال
+        </h3>
+
+
+        <p class="muted">
+          بعد إرسال الطلب سيظهر في لوحة الإدارة.
+          عند تأكيد الطلب يتم إنشاء البطاقة وربطها بحسابك.
+        </p>
+
+
+        <div
+          class="notice"
+          style="margin-top:16px"
+        >
+
+          للطلب أو التواصل مع ZOMA:
+
+          <b>
+            01033459821
+          </b>
+
+        </div>
+
+
+        <div
+          class="notice-box"
+          style="margin-top:16px"
+        >
+
+          <b>
+            مراحل الطلب
+          </b>
+
+          <div
+            class="muted"
+            style="margin-top:8px;line-height:1.9"
+          >
+
+            1. إرسال الطلب<br>
+
+            2. مراجعة الإدارة<br>
+
+            3. تأكيد الطلب<br>
+
+            4. إصدار البطاقة<br>
+
+            5. تجهيز البطاقة وربط NFC وQR
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+(function () {
+
+  'use strict';
+
+
+  /* =========================================================
+     DOM
+  ========================================================= */
+
+  const logoutBtn =
+    document.getElementById('logout');
+
+  const orderForm =
+    document.getElementById('orderForm');
+
+  const designSelect =
+    document.getElementById('design');
+
+  const designPreviewBox =
+    document.getElementById('designPreviewBox');
+
+  const designPreviewImage =
+    document.getElementById('designPreviewImage');
+
+  const designPreviewEmpty =
+    document.getElementById('designPreviewEmpty');
+
+  const selectedDesignName =
+    document.getElementById('selectedDesignName');
+
+  const selectedDesignCode =
+    document.getElementById('selectedDesignCode');
+
+  const selectedDesignPrice =
+    document.getElementById('selectedDesignPrice');
+
+  const nameInput =
+    document.getElementById('name');
+
+  const phoneInput =
+    document.getElementById('phone');
+
+  const govInput =
+    document.getElementById('gov');
+
+  const cityInput =
+    document.getElementById('city');
+
+  const addressInput =
+    document.getElementById('address');
+
+  const notesInput =
+    document.getElementById('notes');
+
+  const priceBox =
+    document.getElementById('price');
+
+  const submitBtn =
+    document.getElementById('submitBtn');
+
+
+  /* =========================================================
+     DATA
+  ========================================================= */
+
+  let designs = [];
+
+  let currentUser = null;
+
+  let currentCustomer = null;
+
+
+  /* =========================================================
+     HELPERS
+  ========================================================= */
+
+  function escapeHtml(value) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.escape === 'function'
+    ) {
+
+      return window.zoma.escape(
+        value == null
+          ? ''
+          : String(value)
+      );
+
+    }
+
+
+    const div =
+      document.createElement('div');
+
+    div.textContent =
+      value == null
+        ? ''
+        : String(value);
+
+    return div.innerHTML;
+
+  }
+
+
+  function money(value) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.money === 'function'
+    ) {
+
+      return window.zoma.money(
+        value
+      );
+
+    }
+
+
+    return (
+      Number(value || 0)
+        .toLocaleString('ar-EG') +
+      ' جنيه'
+    );
+
+  }
+
+
+  function showToast(
+    message,
+    type
+  ) {
+
+    if (
+      window.zoma &&
+      typeof window.zoma.toast === 'function'
+    ) {
+
+      window.zoma.toast(
+        message,
+        type
+      );
+
+      return;
+    }
+
+
+    console.log(
+      message
+    );
+
+  }
+
+
+  /* =========================================================
+     LOGOUT
+  ========================================================= */
+
+  logoutBtn.addEventListener(
+    'click',
+    async function () {
+
+      try {
+
+        if (
+          window.zoma &&
+          typeof window.zoma.signOut === 'function'
+        ) {
+
+          await window.zoma.signOut();
+
+        }
+
+      } catch (error) {
+
+        console.error(
+          'Logout Error:',
+          error
+        );
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     CUSTOMER
+  ========================================================= */
+
+  async function loadCustomer() {
+
+    /*
+     * استخدمنا maybeSingle بدل single
+     * لتجنب خطأ 406 لو لم يوجد السجل.
+     */
+
+    const result =
+      await sb
+        .from('customers')
+        .select('*')
+        .eq(
+          'id',
+          currentUser.id
+        )
+        .maybeSingle();
+
+
+    if (result.error) {
+
+      console.error(
+        'Customer Query Error:',
+        result.error
+      );
+
+      return null;
+
+    }
+
+
+    if (result.data) {
+
+      return result.data;
+
+    }
+
+
+    /*
+     * لو حساب Auth موجود لكن customers
+     * غير موجود، نحاول إنشاء السجل.
+     *
+     * الاسم نأخذه من metadata المحفوظ
+     * أثناء التسجيل.
+     */
+
+    const metadata =
+      currentUser.user_metadata ||
+      {};
+
+
+    const fullName =
+      metadata.full_name ||
+      '';
+
+
+    const phone =
+      metadata.phone ||
+      '';
+
+
+    const insertResult =
+      await sb
+        .from('customers')
+        .insert({
+
+          id:
+            currentUser.id,
+
+          full_name:
+            fullName,
+
+          phone:
+            phone,
+
+          status:
+            'active'
+
+        })
+        .select()
+        .maybeSingle();
+
+
+    if (insertResult.error) {
+
+      console.error(
+        'Create Customer Error:',
+        insertResult.error
+      );
+
+      return null;
+
+    }
+
+
+    return insertResult.data || null;
+
+  }
+
+
+  /* =========================================================
+     LOAD DESIGNS
+  ========================================================= */
+
+  async function loadDesigns() {
+
+    /*
+     * أول محاولة:
+     * التصميم مع أعمدة الصور.
+     */
+
+    let result =
+      await sb
+        .from('designs')
+        .select('*')
+        .eq(
+          'is_available',
+          true
+        )
+        .order(
+          'created_at',
+          {
+            ascending: true
+          }
+        );
+
+
+    /*
+     * لو أعمدة الصور غير موجودة،
+     * نعيد الاستعلام بدونها.
+     */
+
+    if (result.error) {
+
+      console.warn(
+        'Design query with image fields failed:',
+        result.error
+      );
+
+
+      result =
+        await sb
+          .from('designs')
+          .select('*')
+          .eq(
+            'is_available',
+            true
+          )
+          .order(
+            'created_at',
+            {
+              ascending: true
+            }
+          );
+
+    }
+
+
+    if (result.error) {
+
+      console.error(
+        'Design Query Error:',
+        result.error
+      );
+
+
+      designSelect.innerHTML = `
+        <option value="">
+          تعذر تحميل التصميمات
+        </option>
+      `;
+
+
+      showToast(
+        'تعذر تحميل التصميمات',
+        'error'
+      );
+
+
+      return false;
+
+    }
+
+
+    designs =
+      result.data || [];
+
+
+    if (!designs.length) {
+
+      designSelect.innerHTML = `
+        <option value="">
+          لا توجد تصميمات متاحة حاليًا
+        </option>
+      `;
+
+
+      hideDesignPreview();
+
+
+      priceBox.textContent =
+        'السعر: —';
+
+
+      return true;
+
+    }
+
+
+    /*
+     * بناء الاختيارات
+     */
+
+    designSelect.innerHTML =
+      `<option value="">
+        اختر التصميم
+      </option>` +
+      designs
+        .map(
+          function (design) {
+
+            const name =
+              escapeHtml(
+                design.name ||
+                'بدون اسم'
+              );
+
+
+            const code =
+              design.design_code
+                ? ' — ' +
+                  escapeHtml(
+                    design.design_code
+                  )
+                : '';
+
+
+            return `
+              <option value="${escapeHtml(
+                design.id
+              )}">
+                ${name}${code}
+                — ${money(
+                  design.price
+                )}
+              </option>
+            `;
+
+          }
+        )
+        .join('');
+
+
+    updateDesignPreview();
+
+    return true;
+
+  }
+
+
+  /* =========================================================
+     DESIGN IMAGE
+  ========================================================= */
+
+  function getDesignImage(
+    design
+  ) {
+
+    if (!design) {
+      return '';
+    }
+
+
+    return (
+      design.preview_url || ''
+    );
+
+  }
+
+
+  /* =========================================================
+     HIDE PREVIEW
+  ========================================================= */
+
+  function hideDesignPreview() {
+
+    designPreviewBox.style.display =
+      'none';
+
+    designPreviewImage.style.display =
+      'none';
+
+    designPreviewEmpty.style.display =
+      'none';
+
+    designPreviewImage.removeAttribute(
+      'src'
+    );
+
+    selectedDesignName.textContent =
+      '';
+
+    selectedDesignCode.textContent =
+      '';
+
+    selectedDesignPrice.textContent =
+      '';
+
+  }
+
+
+  /* =========================================================
+     UPDATE PREVIEW
+  ========================================================= */
+
+  function updateDesignPreview() {
+
+    const selectedId =
+      designSelect.value;
+
+
+    if (!selectedId) {
+
+      hideDesignPreview();
+
+      priceBox.textContent =
+        'السعر: —';
+
+      return;
+
+    }
+
+
+    const design =
+      designs.find(
+        function (item) {
+
+          return String(item.id) ===
+            String(selectedId);
+
+        }
+      );
+
+
+    if (!design) {
+
+      hideDesignPreview();
+
+      priceBox.textContent =
+        'السعر: —';
+
+      return;
+
+    }
+
+
+    designPreviewBox.style.display =
+      'block';
+
+
+    selectedDesignName.textContent =
+      design.name ||
+      'بدون اسم';
+
+
+    selectedDesignCode.textContent =
+      design.design_code
+        ? 'كود التصميم: ' +
+          design.design_code
+        : '';
+
+
+    selectedDesignPrice.innerHTML =
+      '<b>السعر: </b>' +
+      money(
+        design.price
+      );
+
+
+    priceBox.textContent =
+      'السعر: ' +
+      money(
+        design.price
+      );
+
+
+    const imageUrl =
+      getDesignImage(
+        design
+      );
+
+
+    if (imageUrl) {
+
+      designPreviewImage.src =
+        imageUrl;
+
+      designPreviewImage.style.display =
+        'inline-block';
+
+      designPreviewEmpty.style.display =
+        'none';
+
+
+      designPreviewImage.onerror =
+        function () {
+
+          designPreviewImage.style.display =
+            'none';
+
+          designPreviewEmpty.style.display =
+            'block';
+
+          designPreviewEmpty.textContent =
+            'تعذر تحميل صورة التصميم.';
+
+        };
+
+
+    } else {
+
+      designPreviewImage.style.display =
+        'none';
+
+      designPreviewEmpty.style.display =
+        'block';
+
+      designPreviewEmpty.textContent =
+        'لا توجد صورة معاينة لهذا التصميم.';
+
+    }
+
+  }
+
+
+  designSelect.addEventListener(
+    'change',
+    updateDesignPreview
+  );
+
+
+  /* =========================================================
+     SUBMIT ORDER
+  ========================================================= */
+
+  orderForm.addEventListener(
+    'submit',
+    async function (event) {
+
+      event.preventDefault();
+
+
+      if (!currentUser) {
+
+        showToast(
+          'يجب تسجيل الدخول أولًا',
+          'error'
+        );
+
+        window.location.href =
+          'login.html';
+
+        return;
+
+      }
+
+
+      const selectedDesignId =
+        designSelect.value;
+
+
+      const selectedDesign =
+        designs.find(
+          function (item) {
+
+            return String(item.id) ===
+              String(selectedDesignId);
+
+          }
+        );
+
+
+      if (!selectedDesign) {
+
+        showToast(
+          'من فضلك اختر تصميم البطاقة',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      const customerName =
+        nameInput.value.trim();
+
+      const phone =
+        phoneInput.value.trim();
+
+      const governorate =
+        govInput.value.trim();
+
+      const city =
+        cityInput.value.trim();
+
+      const address =
+        addressInput.value.trim();
+
+      const notes =
+        notesInput.value.trim();
+
+
+      if (
+        !customerName ||
+        !phone ||
+        !governorate ||
+        !city ||
+        !address
+      ) {
+
+        showToast(
+          'من فضلك أكمل بيانات الطلب',
+          'error'
+        );
+
+        return;
+
+      }
+
+
+      submitBtn.disabled =
+        true;
+
+      submitBtn.textContent =
+        'جاري إرسال الطلب...';
+
+
+      try {
+
+        /*
+         * نتأكد أن سجل customers موجود.
+         */
+
+        if (!currentCustomer) {
+
+          currentCustomer =
+            await loadCustomer();
+
+        }
+
+
+        if (!currentCustomer) {
+
+          throw new Error(
+            'بيانات العميل غير موجودة في قاعدة البيانات. تأكد من السماح بإضافة العملاء.'
+          );
+
+        }
+
+
+        /*
+         * تحديث اسم العميل والهاتف
+         */
+
+        const customerUpdate =
+          await sb
+            .from('customers')
+            .update({
+
+              full_name:
+                customerName,
+
+              phone:
+                phone
+
+            })
+            .eq(
+              'id',
+              currentUser.id
+            );
+
+
+        if (customerUpdate.error) {
+
+          throw customerUpdate.error;
+
+        }
+
+
+        /*
+         * رقم الطلب
+         */
+
+        let orderNumber;
+
+
+        if (
+          window.zoma &&
+          typeof window.zoma.orderNo ===
+            'function'
+        ) {
+
+          orderNumber =
+            window.zoma.orderNo();
+
+        } else {
+
+          orderNumber =
+            'ZOMA-' +
+            Date.now();
+
+        }
+
+
+        /*
+         * إنشاء الطلب
+         */
+
+        const orderResult = await sb.rpc('zoma_create_order',{
+          p_design_id:selectedDesign.id,
+          p_customer_name:customerName,
+          p_phone:phone,
+          p_governorate:governorate,
+          p_city:city,
+          p_address:address,
+          p_notes:notes,
+          p_order_number:(window.zoma && window.zoma.orderNo ? window.zoma.orderNo() : 'ZOMA-'+Date.now())
+        });
+        if(orderResult.error){ throw orderResult.error; }
+        const createdOrder=orderResult.data;
+        if(!createdOrder || !createdOrder.id){ throw new Error('تعذر إنشاء الطلب'); }
+
+
+        /*
+         * سجل النشاط
+         */
+
+        if (
+          window.zoma &&
+          typeof window.zoma.log ===
+            'function'
+        ) {
+
+          try {
+
+            await window.zoma.log(
+              'create_order',
+              'order',
+              createdOrder.id,
+              {
+                order_number:
+                  createdOrder.order_number,
+
+                design_id:
+                  selectedDesign.id
+
+              }
+            );
+
+          } catch (logError) {
+
+            console.warn(
+              'Log Error:',
+              logError
+            );
+
+          }
+
+        }
+
+
+        /*
+         * نجاح
+         */
+
+        showToast(
+          'تم إرسال الطلب بنجاح',
+          'success'
+        );
+
+
+        setTimeout(
+          function () {
+
+            window.location.href =
+              'dashboard.html';
+
+          },
+          500
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          'Create Order Error:',
+          error
+        );
+
+
+        showToast(
+          error.message ||
+          'حدث خطأ أثناء إرسال الطلب',
+          'error'
+        );
+
+
+      } finally {
+
+        submitBtn.disabled =
+          false;
+
+        submitBtn.textContent =
+          'إرسال الطلب';
+
+      }
+
+    }
+  );
+
+
+  /* =========================================================
+     BOOT
+  ========================================================= */
+
+  async function boot() {
+
+    try {
+
+      if (
+        !window.zoma ||
+        typeof window.zoma.currentUser !==
+          'function'
+      ) {
+
+        console.error(
+          'app.js غير محمل بشكل صحيح.'
+        );
+
+        return;
+
+      }
+
+
+      currentUser =
+        await window.zoma.currentUser();
+
+
+      if (!currentUser) {
+
+        window.location.href =
+          'login.html';
+
+        return;
+
+      }
+
+
+      /*
+       * تحميل العميل والتصميمات بالتوازي
+       */
+
+      const results =
+        await Promise.all([
+
+          loadCustomer(),
+
+          loadDesigns()
+
+        ]);
+
+
+      currentCustomer =
+        results[0];
+
+
+      if (currentCustomer) {
+
+        nameInput.value =
+          currentCustomer.full_name ||
+          (
+            currentUser.user_metadata?.full_name ||
+            ''
+          );
+
+
+        phoneInput.value =
+          currentCustomer.phone ||
+          (
+            currentUser.user_metadata?.phone ||
+            ''
+          );
+
+      } else {
+
+        /*
+         * حتى لو فشل إنشاء سجل customers،
+         * نملأ الاسم من Auth metadata.
+         */
+
+        nameInput.value =
+          currentUser.user_metadata?.full_name ||
+          '';
+
+        phoneInput.value =
+          currentUser.user_metadata?.phone ||
+          '';
+
+      }
+
+
+    } catch (error) {
+
+      console.error(
+        'Order Boot Error:',
+        error
+      );
+
+
+      showToast(
+        error.message ||
+        'حدث خطأ أثناء تحميل صفحة الطلب',
+        'error'
+      );
+
+    }
+
+  }
+
+
+  boot();
+
+})();
+</script>
+
+</body>
+</html>
