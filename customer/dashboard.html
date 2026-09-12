@@ -589,9 +589,7 @@
 
 
     return (
-      design.image_url ||
       design.preview_url ||
-      design.image ||
       ''
     );
 
@@ -682,8 +680,7 @@
             designs(
               name,
               
-              preview_url,
-              image
+              preview_url
             )
           ),
           profiles(*)
@@ -779,8 +776,7 @@
           designs(
             name,
             
-            preview_url,
-            image
+            preview_url
           )
           `
         )

@@ -1654,16 +1654,20 @@
       }
 
 
-      const result =
-        await sb
+      let result;
+
+      if (status === 'confirmed') {
+        const rpc = await sb.rpc('zoma_confirm_order', {
+          p_order_id: id,
+          p_site_url: window.ZOMA_CONFIG?.SITE_URL || location.origin + '/'
+        });
+        result = { data: rpc.data, error: rpc.error };
+      } else {
+        result = await sb
           .from('orders')
-          .update({
-            status: status
-          })
-          .eq(
-            'id',
-            id
-          );
+          .update({ status })
+          .eq('id', id);
+      }
 
 
       if (result.error) {
@@ -1683,55 +1687,6 @@
       }
 
 
-      /*
-       * مهم:
-       * عند التأكيد يتم إنشاء البطاقة تلقائيًا.
-       */
-
-      if (
-        status === 'confirmed'
-      ) {
-
-        const existingCard =
-          cards.find(
-            function (card) {
-
-              return (
-                card.order_id === id
-              );
-
-            }
-          );
-
-
-        if (!existingCard) {
-
-          const cardResult =
-            await createCardForOrder(
-              order
-            );
-
-
-          if (!cardResult.success) {
-
-            console.error(
-              cardResult.error
-            );
-
-            toast(
-              'تم تأكيد الطلب، لكن تعذر إنشاء البطاقة: ' +
-              cardResult.error,
-              'error'
-            );
-
-            await load();
-
-            return;
-          }
-
-        }
-
-      }
 
 
       try {
@@ -1822,9 +1777,7 @@
 
 
     const designImage =
-      design.image_url ||
       design.preview_url ||
-      design.image ||
       '';
 
 
@@ -4107,9 +4060,7 @@
         function (design) {
 
           const image =
-            design.image_url ||
             design.preview_url ||
-            design.image ||
             '';
 
 
@@ -4533,44 +4484,16 @@
 
 
     /*
-     * نضع الصورة في image_url
-     * إذا كان العمود موجودًا.
+     * preview_url هو عمود الصورة المعتمد في قاعدة البيانات.
      */
-
     if (imageUrl) {
-      payload.image_url =
-        imageUrl;
+      payload.preview_url = imageUrl;
     }
 
-
-    let result =
+    const result =
       await sb
         .from('designs')
         .insert(payload);
-
-
-    /*
-     * لو image_url غير موجود في الجدول
-     * نحاول إنشاء التصميم بدون الصورة.
-     */
-
-    if (
-      result.error &&
-      imageUrl &&
-      /image_url|column/i.test(
-        result.error.message || ''
-      )
-    ) {
-
-      delete payload.image_url;
-
-
-      result =
-        await sb
-          .from('designs')
-          .insert(payload);
-
-    }
 
 
     if (result.error) {

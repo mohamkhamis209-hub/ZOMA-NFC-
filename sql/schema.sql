@@ -102,6 +102,75 @@ language sql stable security definer set search_path=public as $$
 $$;
 grant execute on function public.zoma_get_public_card(text) to anon,authenticated;
 
+-- ZOMA order/card RPCs (idempotent and type-safe)
+drop function if exists public.zoma_create_order(uuid,text,text,text,text,text,text);
+create function public.zoma_create_order(
+  p_design_id uuid,
+  p_customer_name text,
+  p_phone text,
+  p_shipping_governorate text,
+  p_shipping_city text,
+  p_shipping_address text,
+  p_customer_notes text
+) returns public.orders
+language plpgsql security definer set search_path=public as $$
+declare
+  v_customer_id uuid;
+  v_price numeric(12,2);
+  v_order public.orders;
+  v_order_number text;
+begin
+  v_customer_id := auth.uid();
+  if v_customer_id is null then raise exception 'يجب تسجيل الدخول أولاً'; end if;
+  if not exists (select 1 from public.customers where id=v_customer_id) then
+    raise exception 'حساب العميل غير موجود';
+  end if;
+  select price into v_price from public.designs where id=p_design_id and is_available=true;
+  if v_price is null then raise exception 'التصميم غير متاح'; end if;
+  v_order_number := 'ZM-' || to_char(now(),'YYYYMMDD-HH24MISS') || '-' || upper(substr(replace(gen_random_uuid()::text,'-',''),1,6));
+  insert into public.orders(order_number,customer_id,design_id,total_price,status,customer_name,phone,shipping_governorate,shipping_city,shipping_address,customer_notes)
+  values(v_order_number,v_customer_id,p_design_id,v_price,'pending',nullif(trim(p_customer_name),''),nullif(trim(p_phone),''),nullif(trim(p_shipping_governorate),''),nullif(trim(p_shipping_city),''),nullif(trim(p_shipping_address),''),nullif(trim(p_customer_notes),''))
+  returning * into v_order;
+  return v_order;
+end $$;
+grant execute on function public.zoma_create_order(uuid,text,text,text,text,text,text) to authenticated;
+
+drop function if exists public.zoma_issue_card(uuid,text);
+create function public.zoma_issue_card(p_order_id uuid,p_site_url text) returns public.cards
+language plpgsql security definer set search_path=public as $$
+declare
+  v_order public.orders;
+  v_card public.cards;
+  v_profile public.profiles;
+  v_card_id text;
+  v_url text;
+begin
+  if not public.is_admin() then raise exception 'Admin only'; end if;
+  select * into v_order from public.orders where id=p_order_id;
+  if v_order.id is null then raise exception 'الطلب غير موجود'; end if;
+  select * into v_card from public.cards where order_id=p_order_id limit 1;
+  if v_card.id is not null then return v_card; end if;
+  v_card_id := 'ZOMA-' || upper(substr(replace(gen_random_uuid()::text,'-',''),1,10));
+  v_url := rtrim(coalesce(nullif(trim(p_site_url),''),'https://mohamkhamis209-hub.github.io/ZOMA-NFC/'),'/') || '/activation.html?id=' || v_card_id;
+  insert into public.cards(card_id,customer_id,order_id,public_url,status) values(v_card_id,v_order.customer_id,v_order.id,v_url,'unactivated') returning * into v_card;
+  insert into public.profiles(card_id,full_name) values(v_card.id,coalesce(v_order.customer_name,'')) on conflict(card_id) do update set full_name=excluded.full_name;
+  return v_card;
+end $$;
+grant execute on function public.zoma_issue_card(uuid,text) to authenticated;
+
+drop function if exists public.zoma_confirm_order(uuid,text);
+create function public.zoma_confirm_order(p_order_id uuid,p_site_url text) returns public.orders
+language plpgsql security definer set search_path=public as $$
+declare v_order public.orders; v_card public.cards;
+begin
+  if not public.is_admin() then raise exception 'Admin only'; end if;
+  update public.orders set status='confirmed' where id=p_order_id returning * into v_order;
+  if v_order.id is null then raise exception 'الطلب غير موجود'; end if;
+  select * into v_card from public.zoma_issue_card(p_order_id,p_site_url);
+  return v_order;
+end $$;
+grant execute on function public.zoma_confirm_order(uuid,text) to authenticated;
+
 create or replace function public.zoma_reset_year_data() returns void language plpgsql security definer set search_path=public as $$
 begin
  if not exists(select 1 from public.admins where id=auth.uid() and role='owner') then raise exception 'Owner only'; end if;

@@ -675,9 +675,7 @@
         .select(
           `
           *,
-          
-          preview_url,
-          image
+          preview_url
           `
         )
         .eq(
@@ -839,9 +837,7 @@
 
 
     return (
-      design.image_url ||
       design.preview_url ||
-      design.image ||
       ''
     );
 
