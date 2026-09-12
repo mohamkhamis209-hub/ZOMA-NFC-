@@ -27,10 +27,7 @@
 
     <div class="nav-actions">
 
-      <a
-        class="btn"
-        href="dashboard.html"
-      >
+      <a class="btn" href="dashboard.html">
         لوحة العميل
       </a>
 
@@ -55,30 +52,19 @@
 
     <div class="section-title">
 
-      <h2>
-        طلب بطاقة جديدة
-      </h2>
+      <h2>طلب بطاقة جديدة</h2>
 
-      <p>
-        اختر التصميم وأدخل بيانات التوصيل.
-      </p>
+      <p>اختر التصميم وأدخل بيانات التوصيل.</p>
 
     </div>
 
 
     <div class="two-col">
 
-
-      <!-- =====================================================
-           ORDER FORM
-      ====================================================== -->
-
       <form
         id="orderForm"
         class="panel order-card form"
       >
-
-        <!-- التصميمات -->
 
         <div class="field">
 
@@ -86,10 +72,7 @@
             اختر تصميم البطاقة
           </label>
 
-          <select
-            id="design"
-            required
-          >
+          <select id="design" required>
 
             <option value="">
               جاري تحميل التصميمات...
@@ -100,23 +83,15 @@
         </div>
 
 
-        <!-- معاينة التصميم -->
-
         <div
           id="designPreviewBox"
           class="notice-box"
-          style="
-            margin-bottom:16px;
-            display:none;
-          "
+          style="margin-bottom:16px;display:none;"
         >
 
           <div
             id="designPreviewImageWrap"
-            style="
-              text-align:center;
-              margin-bottom:12px;
-            "
+            style="text-align:center;margin-bottom:12px;"
           >
 
             <img
@@ -151,38 +126,30 @@
 
           <div
             id="selectedDesignName"
-            style="
-              font-size:18px;
-              font-weight:700;
-            "
+            style="font-size:18px;font-weight:700;"
           ></div>
 
 
           <div
             id="selectedDesignCode"
             class="muted"
-            style="margin-top:5px"
+            style="margin-top:5px;"
           ></div>
 
 
           <div
             id="selectedDesignPrice"
-            style="margin-top:8px"
+            style="margin-top:8px;"
           ></div>
 
         </div>
 
 
-        <!-- بيانات العميل -->
-
         <div class="grid-2">
-
 
           <div class="field">
 
-            <label for="name">
-              الاسم
-            </label>
+            <label for="name">الاسم</label>
 
             <input
               id="name"
@@ -196,9 +163,7 @@
 
           <div class="field">
 
-            <label for="phone">
-              الهاتف
-            </label>
+            <label for="phone">الهاتف</label>
 
             <input
               id="phone"
@@ -213,37 +178,23 @@
 
           <div class="field">
 
-            <label for="gov">
-              المحافظة
-            </label>
+            <label for="gov">المحافظة</label>
 
-            <input
-              id="gov"
-              type="text"
-              required
-            >
+            <input id="gov" type="text" required>
 
           </div>
 
 
           <div class="field">
 
-            <label for="city">
-              المدينة
-            </label>
+            <label for="city">المدينة</label>
 
-            <input
-              id="city"
-              type="text"
-              required
-            >
+            <input id="city" type="text" required>
 
           </div>
 
         </div>
 
-
-        <!-- العنوان -->
 
         <div class="field">
 
@@ -251,22 +202,14 @@
             العنوان بالتفصيل
           </label>
 
-          <textarea
-            id="address"
-            rows="4"
-            required
-          ></textarea>
+          <textarea id="address" rows="4" required></textarea>
 
         </div>
 
 
-        <!-- ملاحظات -->
-
         <div class="field">
 
-          <label for="notes">
-            ملاحظات
-          </label>
+          <label for="notes">ملاحظات</label>
 
           <textarea
             id="notes"
@@ -277,17 +220,10 @@
         </div>
 
 
-        <!-- السعر -->
-
-        <div
-          class="notice-box"
-          id="price"
-        >
+        <div class="notice-box" id="price">
           السعر: —
         </div>
 
-
-        <!-- زر الإرسال -->
 
         <button
           class="btn primary"
@@ -300,16 +236,9 @@
       </form>
 
 
-      <!-- =====================================================
-           INFO
-      ====================================================== -->
-
       <div class="panel order-card">
 
-        <h3>
-          قبل الإرسال
-        </h3>
-
+        <h3>قبل الإرسال</h3>
 
         <p class="muted">
           بعد إرسال الطلب سيظهر في لوحة الإدارة.
@@ -317,17 +246,9 @@
         </p>
 
 
-        <div
-          class="notice"
-          style="margin-top:16px"
-        >
-
+        <div class="notice" style="margin-top:16px">
           للطلب أو التواصل مع ZOMA:
-
-          <b>
-            01033459821
-          </b>
-
+          <b>01033459821</b>
         </div>
 
 
@@ -336,25 +257,17 @@
           style="margin-top:16px"
         >
 
-          <b>
-            مراحل الطلب
-          </b>
+          <b>مراحل الطلب</b>
 
           <div
             class="muted"
             style="margin-top:8px;line-height:1.9"
           >
-
             1. إرسال الطلب<br>
-
             2. مراجعة الإدارة<br>
-
             3. تأكيد الطلب<br>
-
             4. إصدار البطاقة<br>
-
             5. تجهيز البطاقة وربط NFC وQR
-
           </div>
 
         </div>
@@ -374,65 +287,40 @@
   'use strict';
 
 
-  /* =========================================================
-     DOM
-  ========================================================= */
+  const logoutBtn = document.getElementById('logout');
 
-  const logoutBtn =
-    document.getElementById('logout');
+  const orderForm = document.getElementById('orderForm');
 
-  const orderForm =
-    document.getElementById('orderForm');
+  const designSelect = document.getElementById('design');
 
-  const designSelect =
-    document.getElementById('design');
+  const designPreviewBox = document.getElementById('designPreviewBox');
 
-  const designPreviewBox =
-    document.getElementById('designPreviewBox');
+  const designPreviewImage = document.getElementById('designPreviewImage');
 
-  const designPreviewImage =
-    document.getElementById('designPreviewImage');
+  const designPreviewEmpty = document.getElementById('designPreviewEmpty');
 
-  const designPreviewEmpty =
-    document.getElementById('designPreviewEmpty');
+  const selectedDesignName = document.getElementById('selectedDesignName');
 
-  const selectedDesignName =
-    document.getElementById('selectedDesignName');
+  const selectedDesignCode = document.getElementById('selectedDesignCode');
 
-  const selectedDesignCode =
-    document.getElementById('selectedDesignCode');
+  const selectedDesignPrice = document.getElementById('selectedDesignPrice');
 
-  const selectedDesignPrice =
-    document.getElementById('selectedDesignPrice');
+  const nameInput = document.getElementById('name');
 
-  const nameInput =
-    document.getElementById('name');
+  const phoneInput = document.getElementById('phone');
 
-  const phoneInput =
-    document.getElementById('phone');
+  const govInput = document.getElementById('gov');
 
-  const govInput =
-    document.getElementById('gov');
+  const cityInput = document.getElementById('city');
 
-  const cityInput =
-    document.getElementById('city');
+  const addressInput = document.getElementById('address');
 
-  const addressInput =
-    document.getElementById('address');
+  const notesInput = document.getElementById('notes');
 
-  const notesInput =
-    document.getElementById('notes');
+  const priceBox = document.getElementById('price');
 
-  const priceBox =
-    document.getElementById('price');
+  const submitBtn = document.getElementById('submitBtn');
 
-  const submitBtn =
-    document.getElementById('submitBtn');
-
-
-  /* =========================================================
-     DATA
-  ========================================================= */
 
   let designs = [];
 
@@ -453,21 +341,16 @@
     ) {
 
       return window.zoma.escape(
-        value == null
-          ? ''
-          : String(value)
+        value == null ? '' : String(value)
       );
 
     }
 
 
-    const div =
-      document.createElement('div');
+    const div = document.createElement('div');
 
     div.textContent =
-      value == null
-        ? ''
-        : String(value);
+      value == null ? '' : String(value);
 
     return div.innerHTML;
 
@@ -481,44 +364,33 @@
       typeof window.zoma.money === 'function'
     ) {
 
-      return window.zoma.money(
-        value
-      );
+      return window.zoma.money(value);
 
     }
 
 
     return (
-      Number(value || 0)
-        .toLocaleString('ar-EG') +
+      Number(value || 0).toLocaleString('ar-EG') +
       ' جنيه'
     );
 
   }
 
 
-  function showToast(
-    message,
-    type
-  ) {
+  function showToast(message, type) {
 
     if (
       window.zoma &&
       typeof window.zoma.toast === 'function'
     ) {
 
-      window.zoma.toast(
-        message,
-        type
-      );
+      window.zoma.toast(message, type);
 
       return;
     }
 
 
-    console.log(
-      message
-    );
+    console.log(message);
 
   }
 
@@ -544,10 +416,7 @@
 
       } catch (error) {
 
-        console.error(
-          'Logout Error:',
-          error
-        );
+        console.error('Logout Error:', error);
 
       }
 
@@ -561,81 +430,41 @@
 
   async function loadCustomer() {
 
-    /*
-     * استخدمنا maybeSingle بدل single
-     * لتجنب خطأ 406 لو لم يوجد السجل.
-     */
-
     const result =
       await sb
         .from('customers')
         .select('*')
-        .eq(
-          'id',
-          currentUser.id
-        )
+        .eq('id', currentUser.id)
         .maybeSingle();
 
 
     if (result.error) {
 
-      console.error(
-        'Customer Query Error:',
-        result.error
-      );
+      console.error('Customer Query Error:', result.error);
 
       return null;
 
     }
 
 
-    if (result.data) {
-
-      return result.data;
-
-    }
+    if (result.data) return result.data;
 
 
-    /*
-     * لو حساب Auth موجود لكن customers
-     * غير موجود، نحاول إنشاء السجل.
-     *
-     * الاسم نأخذه من metadata المحفوظ
-     * أثناء التسجيل.
-     */
+    const metadata = currentUser.user_metadata || {};
 
-    const metadata =
-      currentUser.user_metadata ||
-      {};
+    const fullName = metadata.full_name || '';
 
-
-    const fullName =
-      metadata.full_name ||
-      '';
-
-
-    const phone =
-      metadata.phone ||
-      '';
+    const phone = metadata.phone || '';
 
 
     const insertResult =
       await sb
         .from('customers')
         .insert({
-
-          id:
-            currentUser.id,
-
-          full_name:
-            fullName,
-
-          phone:
-            phone,
-
-          status:
-            'active'
-
+          id: currentUser.id,
+          full_name: fullName,
+          phone: phone,
+          status: 'active'
         })
         .select()
         .maybeSingle();
@@ -643,10 +472,7 @@
 
     if (insertResult.error) {
 
-      console.error(
-        'Create Customer Error:',
-        insertResult.error
-      );
+      console.error('Create Customer Error:', insertResult.error);
 
       return null;
 
@@ -664,150 +490,68 @@
 
   async function loadDesigns() {
 
-    /*
-     * أول محاولة:
-     * التصميم مع أعمدة الصور.
-     */
-
     let result =
       await sb
         .from('designs')
-        .select(
-          `
-          *,
-          preview_url
-          `
-        )
-        .eq(
-          'is_available',
-          true
-        )
-        .order(
-          'created_at',
-          {
-            ascending: true
-          }
-        );
-
-
-    /*
-     * لو أعمدة الصور غير موجودة،
-     * نعيد الاستعلام بدونها.
-     */
-
-    if (result.error) {
-
-      console.warn(
-        'Design query with image fields failed:',
-        result.error
-      );
-
-
-      result =
-        await sb
-          .from('designs')
-          .select('*')
-          .eq(
-            'is_available',
-            true
-          )
-          .order(
-            'created_at',
-            {
-              ascending: true
-            }
-          );
-
-    }
+        .select('*')
+        .eq('is_available', true)
+        .order('created_at', { ascending: true });
 
 
     if (result.error) {
 
-      console.error(
-        'Design Query Error:',
-        result.error
-      );
+      console.error('Design Query Error:', result.error);
 
 
       designSelect.innerHTML = `
-        <option value="">
-          تعذر تحميل التصميمات
-        </option>
+        <option value="">تعذر تحميل التصميمات</option>
       `;
 
 
-      showToast(
-        'تعذر تحميل التصميمات',
-        'error'
-      );
-
+      showToast('تعذر تحميل التصميمات', 'error');
 
       return false;
 
     }
 
 
-    designs =
-      result.data || [];
+    designs = result.data || [];
 
 
     if (!designs.length) {
 
       designSelect.innerHTML = `
-        <option value="">
-          لا توجد تصميمات متاحة حاليًا
-        </option>
+        <option value="">لا توجد تصميمات متاحة حاليًا</option>
       `;
 
 
       hideDesignPreview();
 
-
-      priceBox.textContent =
-        'السعر: —';
-
+      priceBox.textContent = 'السعر: —';
 
       return true;
 
     }
 
 
-    /*
-     * بناء الاختيارات
-     */
-
     designSelect.innerHTML =
-      `<option value="">
-        اختر التصميم
-      </option>` +
+      `<option value="">اختر التصميم</option>` +
       designs
         .map(
           function (design) {
 
             const name =
-              escapeHtml(
-                design.name ||
-                'بدون اسم'
-              );
-
+              escapeHtml(design.name || 'بدون اسم');
 
             const code =
               design.design_code
-                ? ' — ' +
-                  escapeHtml(
-                    design.design_code
-                  )
+                ? ' — ' + escapeHtml(design.design_code)
                 : '';
 
 
             return `
-              <option value="${escapeHtml(
-                design.id
-              )}">
-                ${name}${code}
-                — ${money(
-                  design.price
-                )}
+              <option value="${escapeHtml(design.id)}">
+                ${name}${code} — ${money(design.price)}
               </option>
             `;
 
@@ -824,73 +568,38 @@
 
 
   /* =========================================================
-     DESIGN IMAGE
-  ========================================================= */
-
-  function getDesignImage(
-    design
-  ) {
-
-    if (!design) {
-      return '';
-    }
-
-
-    return (
-      design.preview_url ||
-      ''
-    );
-
-  }
-
-
-  /* =========================================================
-     HIDE PREVIEW
+     DESIGN PREVIEW
   ========================================================= */
 
   function hideDesignPreview() {
 
-    designPreviewBox.style.display =
-      'none';
+    designPreviewBox.style.display = 'none';
 
-    designPreviewImage.style.display =
-      'none';
+    designPreviewImage.style.display = 'none';
 
-    designPreviewEmpty.style.display =
-      'none';
+    designPreviewEmpty.style.display = 'none';
 
-    designPreviewImage.removeAttribute(
-      'src'
-    );
+    designPreviewImage.removeAttribute('src');
 
-    selectedDesignName.textContent =
-      '';
+    selectedDesignName.textContent = '';
 
-    selectedDesignCode.textContent =
-      '';
+    selectedDesignCode.textContent = '';
 
-    selectedDesignPrice.textContent =
-      '';
+    selectedDesignPrice.textContent = '';
 
   }
 
 
-  /* =========================================================
-     UPDATE PREVIEW
-  ========================================================= */
-
   function updateDesignPreview() {
 
-    const selectedId =
-      designSelect.value;
+    const selectedId = designSelect.value;
 
 
     if (!selectedId) {
 
       hideDesignPreview();
 
-      priceBox.textContent =
-        'السعر: —';
+      priceBox.textContent = 'السعر: —';
 
       return;
 
@@ -901,8 +610,7 @@
       designs.find(
         function (item) {
 
-          return String(item.id) ===
-            String(selectedId);
+          return String(item.id) === String(selectedId);
 
         }
       );
@@ -912,84 +620,63 @@
 
       hideDesignPreview();
 
-      priceBox.textContent =
-        'السعر: —';
+      priceBox.textContent = 'السعر: —';
 
       return;
 
     }
 
 
-    designPreviewBox.style.display =
-      'block';
+    designPreviewBox.style.display = 'block';
 
 
     selectedDesignName.textContent =
-      design.name ||
-      'بدون اسم';
+      design.name || 'بدون اسم';
 
 
     selectedDesignCode.textContent =
       design.design_code
-        ? 'كود التصميم: ' +
-          design.design_code
+        ? 'كود التصميم: ' + design.design_code
         : '';
 
 
     selectedDesignPrice.innerHTML =
-      '<b>السعر: </b>' +
-      money(
-        design.price
-      );
+      '<b>السعر: </b>' + money(design.price);
 
 
     priceBox.textContent =
-      'السعر: ' +
-      money(
-        design.price
-      );
+      'السعر: ' + money(design.price);
 
 
-    const imageUrl =
-      getDesignImage(
-        design
-      );
+    const imageUrl = design.preview_url || '';
 
 
     if (imageUrl) {
 
-      designPreviewImage.src =
-        imageUrl;
+      designPreviewImage.src = imageUrl;
 
-      designPreviewImage.style.display =
-        'inline-block';
+      designPreviewImage.style.display = 'inline-block';
 
-      designPreviewEmpty.style.display =
-        'none';
+      designPreviewEmpty.style.display = 'none';
 
 
-      designPreviewImage.onerror =
-        function () {
+      designPreviewImage.onerror = function () {
 
-          designPreviewImage.style.display =
-            'none';
+        designPreviewImage.style.display = 'none';
 
-          designPreviewEmpty.style.display =
-            'block';
+        designPreviewEmpty.style.display = 'block';
 
-          designPreviewEmpty.textContent =
-            'تعذر تحميل صورة التصميم.';
+        designPreviewEmpty.textContent =
+          'تعذر تحميل صورة التصميم.';
 
-        };
+      };
 
 
     } else {
 
-      designPreviewImage.style.display =
-        'none';
+      designPreviewImage.style.display = 'none';
 
-      designPreviewEmpty.style.display =
-        'block';
+      designPreviewEmpty.style.display = 'block';
 
       designPreviewEmpty.textContent =
         'لا توجد صورة معاينة لهذا التصميم.';
@@ -999,10 +686,7 @@
   }
 
 
-  designSelect.addEventListener(
-    'change',
-    updateDesignPreview
-  );
+  designSelect.addEventListener('change', updateDesignPreview);
 
 
   /* =========================================================
@@ -1018,29 +702,23 @@
 
       if (!currentUser) {
 
-        showToast(
-          'يجب تسجيل الدخول أولًا',
-          'error'
-        );
+        showToast('يجب تسجيل الدخول أولًا', 'error');
 
-        window.location.href =
-          'login.html';
+        window.location.href = 'login.html';
 
         return;
 
       }
 
 
-      const selectedDesignId =
-        designSelect.value;
+      const selectedDesignId = designSelect.value;
 
 
       const selectedDesign =
         designs.find(
           function (item) {
 
-            return String(item.id) ===
-              String(selectedDesignId);
+            return String(item.id) === String(selectedDesignId);
 
           }
         );
@@ -1048,33 +726,24 @@
 
       if (!selectedDesign) {
 
-        showToast(
-          'من فضلك اختر تصميم البطاقة',
-          'error'
-        );
+        showToast('من فضلك اختر تصميم البطاقة', 'error');
 
         return;
 
       }
 
 
-      const customerName =
-        nameInput.value.trim();
+      const customerName = nameInput.value.trim();
 
-      const phone =
-        phoneInput.value.trim();
+      const phone = phoneInput.value.trim();
 
-      const governorate =
-        govInput.value.trim();
+      const governorate = govInput.value.trim();
 
-      const city =
-        cityInput.value.trim();
+      const city = cityInput.value.trim();
 
-      const address =
-        addressInput.value.trim();
+      const address = addressInput.value.trim();
 
-      const notes =
-        notesInput.value.trim();
+      const notes = notesInput.value.trim();
 
 
       if (
@@ -1085,33 +754,23 @@
         !address
       ) {
 
-        showToast(
-          'من فضلك أكمل بيانات الطلب',
-          'error'
-        );
+        showToast('من فضلك أكمل بيانات الطلب', 'error');
 
         return;
 
       }
 
 
-      submitBtn.disabled =
-        true;
+      submitBtn.disabled = true;
 
-      submitBtn.textContent =
-        'جاري إرسال الطلب...';
+      submitBtn.textContent = 'جاري إرسال الطلب...';
 
 
       try {
 
-        /*
-         * نتأكد أن سجل customers موجود.
-         */
-
         if (!currentCustomer) {
 
-          currentCustomer =
-            await loadCustomer();
+          currentCustomer = await loadCustomer();
 
         }
 
@@ -1125,26 +784,16 @@
         }
 
 
-        /*
-         * تحديث اسم العميل والهاتف
-         */
+        /* تحديث بيانات العميل */
 
         const customerUpdate =
           await sb
             .from('customers')
             .update({
-
-              full_name:
-                customerName,
-
-              phone:
-                phone
-
+              full_name: customerName,
+              phone: phone
             })
-            .eq(
-              'id',
-              currentUser.id
-            );
+            .eq('id', currentUser.id);
 
 
         if (customerUpdate.error) {
@@ -1154,121 +803,111 @@
         }
 
 
-        /*
-         * رقم الطلب
-         */
+        /* رقم الطلب */
 
         let orderNumber;
 
-
         if (
           window.zoma &&
-          typeof window.zoma.orderNo ===
-            'function'
+          typeof window.zoma.orderNo === 'function'
         ) {
 
-          orderNumber =
-            window.zoma.orderNo();
+          orderNumber = window.zoma.orderNo();
 
         } else {
 
-          orderNumber =
-            'ZOMA-' +
-            Date.now();
+          orderNumber = 'ZOMA-' + Date.now();
 
         }
 
 
-        /*
-         * إنشاء الطلب
-         */
+        /* محاولة RPC أولًا */
 
-        const orderPayload = {
-
-          customer_id:
-            currentUser.id,
-
-          design_id:
-            selectedDesign.id,
-
-          order_number:
-            orderNumber,
-
-          total_price:
-            Number(
-              selectedDesign.price || 0
-            ),
-
-          customer_name:
-            customerName,
-
-          phone:
-            phone,
-
-          shipping_governorate:
-            governorate,
-
-          shipping_city:
-            city,
-
-          shipping_address:
-            address,
-
-          customer_notes:
-            notes,
-
-          status:
-            'pending'
-
-        };
-
+        let orderData = null;
 
         const { data: rpcOrder, error: rpcError } =
           await sb.rpc('zoma_create_order', {
+
             p_design_id: selectedDesign.id,
+
             p_customer_name: customerName,
+
             p_phone: phone,
+
             p_shipping_governorate: governorate,
+
             p_shipping_city: city,
+
             p_shipping_address: address,
+
             p_customer_notes: notes
+
           });
 
-        const orderResult = { data: rpcOrder, error: rpcError };
+
+        if (!rpcError && rpcOrder) {
+
+          orderData = rpcOrder;
+
+        } else {
+
+          /* Fallback: insert مباشر */
+
+          console.warn('RPC create order failed; using direct insert:', rpcError);
 
 
-        if (orderResult.error) {
-          console.warn('RPC create order failed; trying direct orders insert:', orderResult.error);
-          const fallbackInsert = await sb.from('orders').insert({
-            order_number: 'ZM-' + Date.now(),
-            customer_id: user.id,
-            design_id: selectedDesign.id,
-            total_price: Number(selectedDesign.price || 0),
-            status: 'pending',
-            customer_name: customerName || null,
-            phone: phone || null,
-            shipping_governorate: governorate || null,
-            shipping_city: city || null,
-            shipping_address: address || null,
-            customer_notes: notes || null
-          }).select('*').single();
+          const fallbackInsert =
+            await sb
+              .from('orders')
+              .insert({
+
+                order_number: orderNumber,
+
+                customer_id: currentUser.id,   /* ✅ تم إصلاح الخطأ */
+
+                design_id: selectedDesign.id,
+
+                total_price: Number(selectedDesign.price || 0),
+
+                status: 'pending',
+
+                customer_name: customerName || null,
+
+                phone: phone || null,
+
+                shipping_governorate: governorate || null,
+
+                shipping_city: city || null,
+
+                shipping_address: address || null,
+
+                customer_notes: notes || null
+
+              })
+              .select('*')
+              .single();
+
 
           if (fallbackInsert.error) {
+
             console.error('Direct create order error:', fallbackInsert.error);
+
             throw fallbackInsert.error;
+
           }
-          orderResult.data = fallbackInsert.data;
+
+
+          orderData = fallbackInsert.data;
+
         }
 
 
-        /*
-         * سجل النشاط
-         */
+        /* سجل النشاط */
 
         if (
           window.zoma &&
-          typeof window.zoma.log ===
-            'function'
+          typeof window.zoma.log === 'function' &&
+          orderData
         ) {
 
           try {
@@ -1276,44 +915,29 @@
             await window.zoma.log(
               'create_order',
               'order',
-              orderResult.data.id,
+              orderData.id,
               {
-                order_number:
-                  orderNumber,
-
-                design_id:
-                  selectedDesign.id
-
+                order_number: orderNumber,
+                design_id: selectedDesign.id
               }
             );
 
           } catch (logError) {
 
-            console.warn(
-              'Log Error:',
-              logError
-            );
+            console.warn('Log Error:', logError);
 
           }
 
         }
 
 
-        /*
-         * نجاح
-         */
-
-        showToast(
-          'تم إرسال الطلب بنجاح',
-          'success'
-        );
+        showToast('تم إرسال الطلب بنجاح', 'success');
 
 
         setTimeout(
           function () {
 
-            window.location.href =
-              'dashboard.html';
+            window.location.href = 'dashboard.html';
 
           },
           500
@@ -1322,26 +946,19 @@
 
       } catch (error) {
 
-        console.error(
-          'Create Order Error:',
-          error
-        );
-
+        console.error('Create Order Error:', error);
 
         showToast(
-          error.message ||
-          'حدث خطأ أثناء إرسال الطلب',
+          error.message || 'حدث خطأ أثناء إرسال الطلب',
           'error'
         );
 
 
       } finally {
 
-        submitBtn.disabled =
-          false;
+        submitBtn.disabled = false;
 
-        submitBtn.textContent =
-          'إرسال الطلب';
+        submitBtn.textContent = 'إرسال الطلب';
 
       }
 
@@ -1359,97 +976,68 @@
 
       if (
         !window.zoma ||
-        typeof window.zoma.currentUser !==
-          'function'
+        typeof window.zoma.currentUser !== 'function'
       ) {
 
-        console.error(
-          'app.js غير محمل بشكل صحيح.'
-        );
+        console.error('app.js غير محمل بشكل صحيح.');
 
         return;
 
       }
 
 
-      currentUser =
-        await window.zoma.currentUser();
+      currentUser = await window.zoma.currentUser();
 
 
       if (!currentUser) {
 
-        window.location.href =
-          'login.html';
+        window.location.href = 'login.html';
 
         return;
 
       }
 
 
-      /*
-       * تحميل العميل والتصميمات بالتوازي
-       */
+      const results = await Promise.all([
 
-      const results =
-        await Promise.all([
+        loadCustomer(),
 
-          loadCustomer(),
+        loadDesigns()
 
-          loadDesigns()
-
-        ]);
+      ]);
 
 
-      currentCustomer =
-        results[0];
+      currentCustomer = results[0];
 
 
       if (currentCustomer) {
 
         nameInput.value =
           currentCustomer.full_name ||
-          (
-            currentUser.user_metadata?.full_name ||
-            ''
-          );
+          (currentUser.user_metadata?.full_name || '');
 
 
         phoneInput.value =
           currentCustomer.phone ||
-          (
-            currentUser.user_metadata?.phone ||
-            ''
-          );
+          (currentUser.user_metadata?.phone || '');
 
       } else {
 
-        /*
-         * حتى لو فشل إنشاء سجل customers،
-         * نملأ الاسم من Auth metadata.
-         */
-
         nameInput.value =
-          currentUser.user_metadata?.full_name ||
-          '';
+          currentUser.user_metadata?.full_name || '';
 
         phoneInput.value =
-          currentUser.user_metadata?.phone ||
-          '';
+          currentUser.user_metadata?.phone || '';
 
       }
 
 
     } catch (error) {
 
-      console.error(
-        'Order Boot Error:',
-        error
-      );
-
+      console.error('Order Boot Error:', error);
 
       showToast(
-        error.message ||
-        'حدث خطأ أثناء تحميل صفحة الطلب',
+        error.message || 'حدث خطأ أثناء تحميل صفحة الطلب',
         'error'
       );
 
