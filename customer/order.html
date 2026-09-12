@@ -675,7 +675,7 @@
         .select(
           `
           *,
-          image_url,
+          
           preview_url,
           image
           `
@@ -1227,14 +1227,18 @@
         };
 
 
-        const orderResult =
-          await sb
-            .from('orders')
-            .insert(
-              orderPayload
-            )
-            .select()
-            .single();
+        const { data: rpcOrder, error: rpcError } =
+          await sb.rpc('zoma_create_order', {
+            p_design_id: selectedDesign.id,
+            p_customer_name: customerName,
+            p_phone: phone,
+            p_shipping_governorate: governorate,
+            p_shipping_city: city,
+            p_shipping_address: address,
+            p_customer_notes: notes
+          });
+
+        const orderResult = { data: rpcOrder, error: rpcError };
 
 
         if (orderResult.error) {

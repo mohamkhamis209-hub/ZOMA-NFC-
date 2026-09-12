@@ -23,3 +23,6 @@ ZOMA Smart Card - Full GitHub Pages + Supabase build
    Before activation it shows the secure setup flow. After activation it goes to the public card profile.
 9) Production hardening:
    Use Supabase publishable key in the browser, keep secret/service_role keys off the frontend, configure stronger anti-abuse rules, email/phone verification, backups, and custom domain before public launch.
+
+
+FIX 2026-09-12: Removed references to nonexistent designs.image_url/designs.image columns; customer order creation uses zoma_create_order RPC; admin orders query uses explicit existing columns.

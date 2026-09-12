@@ -1005,7 +1005,7 @@
 
           sb
             .from('orders')
-            .select('*')
+            .select('id,order_number,customer_id,design_id,total_price,status,customer_name,phone,shipping_governorate,shipping_city,shipping_address,customer_notes,admin_notes,created_at,updated_at')
             .order('created_at', { ascending: false }),
 
           sb
