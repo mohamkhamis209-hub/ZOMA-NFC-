@@ -50,11 +50,6 @@
 
   <div class="container">
 
-
-    <!-- =========================
-         HEADER
-    ========================== -->
-
     <div class="dash-top">
 
       <div>
@@ -74,16 +69,7 @@
     </div>
 
 
-    <!-- =========================
-         PROFILE + CARDS
-    ========================== -->
-
     <div class="two-col">
-
-
-      <!-- =========================
-           PROFILE
-      ========================== -->
 
       <section class="panel order-card">
 
@@ -237,10 +223,6 @@
       </section>
 
 
-      <!-- =========================
-           CARDS
-      ========================== -->
-
       <section class="panel order-card">
 
         <div class="toolbar">
@@ -258,10 +240,6 @@
 
     </div>
 
-
-    <!-- =========================
-         MESSAGES
-    ========================== -->
 
     <section
       class="panel order-card"
@@ -324,10 +302,6 @@
 
     </section>
 
-
-    <!-- =========================
-         ORDERS
-    ========================== -->
 
     <section
       class="panel order-card"
@@ -435,6 +409,8 @@
 
   let orderRows = [];
 
+  let messageRows = [];
+
 
   /* =========================================================
      HELPERS
@@ -500,35 +476,16 @@
 
     const labels = {
 
-      pending:
-        'قيد المراجعة',
-
-      confirmed:
-        'تم التأكيد',
-
-      preparing:
-        'جاري التجهيز',
-
-      ready:
-        'جاهز',
-
-      shipped:
-        'تم الشحن',
-
-      delivered:
-        'تم التسليم',
-
-      rejected:
-        'مرفوض',
-
-      active:
-        'نشطة',
-
-      suspended:
-        'موقوفة',
-
-      unactivated:
-        'غير مفعلة'
+      pending: 'قيد المراجعة',
+      confirmed: 'تم التأكيد',
+      preparing: 'جاري التجهيز',
+      ready: 'جاهز',
+      shipped: 'تم الشحن',
+      delivered: 'تم التسليم',
+      rejected: 'مرفوض',
+      active: 'نشطة',
+      suspended: 'موقوفة',
+      unactivated: 'غير مفعلة'
 
     };
 
@@ -565,33 +522,13 @@
       typeof window.zoma.toast === 'function'
     ) {
 
-      window.zoma.toast(
-        message,
-        type
-      );
+      window.zoma.toast(message, type);
 
     } else {
 
-      console.log(
-        message
-      );
+      console.log(message);
 
     }
-
-  }
-
-
-  function getDesignImage(design) {
-
-    if (!design) {
-      return '';
-    }
-
-
-    return (
-      design.preview_url ||
-      ''
-    );
 
   }
 
@@ -617,10 +554,7 @@
 
       } catch (error) {
 
-        console.error(
-          'Logout Error:',
-          error
-        );
+        console.error('Logout Error:', error);
 
       }
 
@@ -638,19 +572,13 @@
       await sb
         .from('customers')
         .select('*')
-        .eq(
-          'id',
-          user.id
-        )
+        .eq('id', user.id)
         .maybeSingle();
 
 
     if (result.error) {
 
-      console.error(
-        'Customer Error:',
-        result.error
-      );
+      console.error('Customer Error:', result.error);
 
       return null;
     }
@@ -662,90 +590,267 @@
 
 
   /* =========================================================
-     LOAD CARDS
+     LOAD CARDS  (fixed - no broken embeddings)
   ========================================================= */
 
   async function loadCards() {
-    // Read cards without PostgREST relationship embedding first.
-    // This avoids 400 errors when the Supabase schema cache has stale relationships.
-    const result = await sb.from('cards')
+
+    const result = await sb
+      .from('cards')
       .select('id,card_id,customer_id,order_id,public_url,status,created_at,updated_at')
       .eq('customer_id', user.id)
       .order('created_at', { ascending: false });
 
+
     if (result.error) {
+
       console.error('Cards query:', result.error);
+
       return [];
     }
 
+
     const rows = result.data || [];
+
     if (!rows.length) return [];
 
+
     const orderIds = rows.map(x => x.order_id).filter(Boolean);
+
     const cardIds = rows.map(x => x.id).filter(Boolean);
 
+
     const [ordersRes, profilesRes] = await Promise.all([
+
       orderIds.length
-        ? sb.from('orders').select('id,order_number,status,total_price,design_id,created_at').in('id', orderIds)
-        : Promise.resolve({data: [], error: null}),
+        ? sb.from('orders')
+            .select('id,order_number,status,total_price,design_id,created_at')
+            .in('id', orderIds)
+        : Promise.resolve({ data: [], error: null }),
+
       cardIds.length
         ? sb.from('profiles').select('*').in('card_id', cardIds)
-        : Promise.resolve({data: [], error: null})
+        : Promise.resolve({ data: [], error: null })
+
     ]);
 
-    let designsRes = {data: [], error: null};
-    const designIds = (ordersRes.data || []).map(x => x.design_id).filter(Boolean);
+
+    let designsRes = { data: [], error: null };
+
+    const designIds = (ordersRes.data || [])
+      .map(x => x.design_id)
+      .filter(Boolean);
+
+
     if (designIds.length) {
-      designsRes = await sb.from('designs').select('id,name,design_code,design_type,template_config,preview_url').in('id', designIds);
+
+      designsRes = await sb
+        .from('designs')
+        .select('id,name,design_code,design_type,template_config,preview_url')
+        .in('id', designIds);
+
     }
 
-    const ordersById = Object.fromEntries((ordersRes.data || []).map(x => [x.id, x]));
-    const profilesByCard = Object.fromEntries((profilesRes.data || []).map(x => [x.card_id, x]));
-    const designsById = Object.fromEntries((designsRes.data || []).map(x => [x.id, x]));
+
+    const ordersById = Object.fromEntries(
+      (ordersRes.data || []).map(x => [x.id, x])
+    );
+
+    const profilesByCard = Object.fromEntries(
+      (profilesRes.data || []).map(x => [x.card_id, x])
+    );
+
+    const designsById = Object.fromEntries(
+      (designsRes.data || []).map(x => [x.id, x])
+    );
+
 
     return rows.map(card => {
+
       const order = ordersById[card.order_id] || null;
+
+      const design =
+        order && order.design_id && designsById[order.design_id]
+          ? designsById[order.design_id]
+          : null;
+
+
       return {
+
         ...card,
-        orders: order ? [{ ...order, designs: order.design_id && designsById[order.design_id] ? [designsById[order.design_id]] : [] }] : [],
-        profiles: profilesByCard[card.id] ? [profilesByCard[card.id]] : []
+
+        orders: order
+          ? [{ ...order, designs: design ? [design] : [] }]
+          : [],
+
+        profiles: profilesByCard[card.id]
+          ? [profilesByCard[card.id]]
+          : []
+
       };
+
     });
+
   }
 
+
   /* =========================================================
-     LOAD ORDERS
+     LOAD ORDERS  (fixed)
   ========================================================= */
 
   async function loadOrders() {
-    // Do not embed designs here. Fetch the order rows first, then designs separately.
-    const result = await sb.from('orders')
+
+    const result = await sb
+      .from('orders')
       .select('id,order_number,customer_id,design_id,total_price,status,customer_name,phone,shipping_governorate,shipping_city,shipping_address,customer_notes,admin_notes,created_at,updated_at')
       .eq('customer_id', user.id)
       .order('created_at', { ascending: false });
 
+
     if (result.error) {
+
       console.error('Orders query:', result.error);
+
       return [];
     }
 
+
     const rows = result.data || [];
-    const designIds = rows.map(x => x.design_id).filter(Boolean);
+
+    const designIds = rows
+      .map(x => x.design_id)
+      .filter(Boolean);
+
+
     let designs = [];
+
     if (designIds.length) {
-      const d = await sb.from('designs').select('id,name,design_code,design_type,template_config,preview_url').in('id', designIds);
+
+      const d = await sb
+        .from('designs')
+        .select('id,name,design_code,design_type,template_config,preview_url')
+        .in('id', designIds);
+
+
       if (!d.error) designs = d.data || [];
+
     }
+
+
     const byId = Object.fromEntries(designs.map(x => [x.id, x]));
+
+
     return rows.map(order => ({
+
       ...order,
-      designs: order.design_id && byId[order.design_id] ? [byId[order.design_id]] : []
+
+      designs:
+        order.design_id && byId[order.design_id]
+          ? [byId[order.design_id]]
+          : []
+
     }));
+
   }
 
 
   /* =========================================================
-     RENDER ORDERS
+     LOAD MESSAGES  (NEW - was missing!)
+  ========================================================= */
+
+  async function loadMessages() {
+
+    const result = await sb
+      .from('messages')
+      .select('*')
+      .eq('customer_id', user.id)
+      .order('created_at', { ascending: false });
+
+
+    if (result.error) {
+
+      console.error('Messages query:', result.error);
+
+      return [];
+    }
+
+
+    return result.data || [];
+
+  }
+
+
+  /* =========================================================
+     LOAD PROFILE INTO FORM  (NEW - was missing!)
+  ========================================================= */
+
+  function loadProfileIntoForm(customer, cards) {
+
+    if (customer) {
+
+      helloEl.textContent =
+        customer.full_name || '';
+
+      fullNameEl.value =
+        customer.full_name || '';
+
+    }
+
+
+    const card =
+      Array.isArray(cards) && cards.length
+        ? cards[0]
+        : null;
+
+
+    if (!card) {
+
+      profileCardHintEl.textContent =
+        'لم يتم إصدار بطاقة بعد. سيتم ربط Facebook وTikTok وWhatsApp والصورة عند إصدار البطاقة.';
+
+      return;
+    }
+
+
+    const profile =
+      card.profiles && card.profiles.length
+        ? card.profiles[0]
+        : null;
+
+
+    if (!profile) {
+
+      profileCardHintEl.textContent =
+        'البطاقة موجودة، لكن لا توجد بيانات ملف مربوطة بعد.';
+
+      return;
+    }
+
+
+    facebookUrlEl.value = profile.facebook_url || '';
+    tiktokUrlEl.value = profile.tiktok_url || '';
+    whatsapp1El.value = profile.whatsapp_1 || '';
+    whatsapp2El.value = profile.whatsapp_2 || '';
+    showWhatsapp2El.value =
+      profile.show_whatsapp_2 ? 'true' : 'false';
+
+
+    if (profile.full_name) {
+
+      fullNameEl.value =
+        profile.full_name;
+
+    }
+
+
+    profileCardHintEl.textContent =
+      'تم تحميل بيانات البطاقة.';
+
+  }
+
+
+  /* =========================================================
+     RENDER ORDERS  (fixed - designs is an array)
   ========================================================= */
 
   function renderOrders() {
@@ -758,9 +863,7 @@
 
           لا توجد طلبات.
 
-          <div
-            style="margin-top:10px"
-          >
+          <div style="margin-top:10px">
 
             <a
               class="btn primary"
@@ -785,24 +888,23 @@
           function (order) {
 
             const design =
-              order.designs || null;
+              order.designs && order.designs.length
+                ? order.designs[0]
+                : null;
 
 
             const designImage =
-              getDesignImage(
-                design
-              );
+              design && design.preview_url
+                ? design.preview_url
+                : '';
 
 
             return `
 
               <div
                 class="notice-box"
-                style="
-                  margin-bottom:12px;
-                "
+                style="margin-bottom:12px;"
               >
-
 
                 <div
                   style="
@@ -813,22 +915,13 @@
                   "
                 >
 
-
                   ${
                     designImage
 
                       ? `
-                        <div
-                          style="
-                            width:150px;
-                            flex:0 0 150px;
-                          "
-                        >
-
+                        <div style="width:150px;flex:0 0 150px;">
                           <img
-                            src="${escapeHtml(
-                              designImage
-                            )}"
+                            src="${escapeHtml(designImage)}"
                             alt="معاينة التصميم"
                             style="
                               width:150px;
@@ -838,7 +931,6 @@
                               background:#fff;
                             "
                           >
-
                         </div>
                       `
 
@@ -855,86 +947,38 @@
                             border:1px solid rgba(255,255,255,.08);
                           "
                         >
-
                           <span class="muted">
                             لا توجد معاينة
                           </span>
-
                         </div>
                       `
                   }
 
 
-                  <div
-                    style="
-                      flex:1;
-                      min-width:220px;
-                    "
-                  >
+                  <div style="flex:1;min-width:220px;">
 
-                    <div
-                      style="
-                        font-weight:700;
-                        font-size:17px;
-                      "
-                    >
-
-                      ${escapeHtml(
-                        order.order_number ||
-                        'طلب'
-                      )}
-
+                    <div style="font-weight:700;font-size:17px;">
+                      ${escapeHtml(order.order_number || 'طلب')}
                     </div>
 
 
-                    <div
-                      class="muted"
-                      style="margin-top:6px"
-                    >
-
+                    <div class="muted" style="margin-top:6px;">
                       التصميم:
-
-                      ${escapeHtml(
-                        design?.name ||
-                        '—'
-                      )}
-
+                      ${escapeHtml(design && design.name ? design.name : '—')}
                     </div>
 
 
-                    <div
-                      style="margin-top:7px"
-                    >
-
+                    <div style="margin-top:7px;">
                       السعر:
-
-                      <b>
-                        ${money(
-                          order.total_price
-                        )}
-                      </b>
-
+                      <b>${money(order.total_price)}</b>
                     </div>
 
 
-                    <div
-                      style="margin-top:7px"
-                    >
-
+                    <div style="margin-top:7px;">
                       الحالة:
-
-                      <span
-                        class="status ${statusClass(
-                          order.status
-                        )}"
-                      >
-                        ${escapeHtml(
-                          statusLabel(
-                            order.status
-                          )
-                        )}
+                      <span class="status ${statusClass(order.status)}">
+                        ${escapeHtml(statusLabel(order.status))}
                       </span>
-
                     </div>
 
 
@@ -942,19 +986,9 @@
                       order.admin_notes
 
                         ? `
-                          <div
-                            class="muted"
-                            style="
-                              margin-top:9px;
-                            "
-                          >
-
+                          <div class="muted" style="margin-top:9px;">
                             ملاحظات الإدارة:
-
-                            ${escapeHtml(
-                              order.admin_notes
-                            )}
-
+                            ${escapeHtml(order.admin_notes)}
                           </div>
                         `
 
@@ -968,17 +1002,139 @@
                         ? `
                           <div
                             class="muted"
-                            style="
-                              margin-top:9px;
-                              font-size:13px;
-                            "
+                            style="margin-top:9px;font-size:13px;"
                           >
                             تاريخ الطلب:
-                            ${new Date(
-                              order.created_at
-                            ).toLocaleString(
-                              'ar-EG'
-                            )}
+                            ${new Date(order.created_at).toLocaleString('ar-EG')}
+                          </div>
+                        `
+
+                        : ''
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+            `;
+
+          }
+        )
+        .join('');
+
+  }
+
+
+  /* =========================================================
+     RENDER CARDS  (NEW - was missing!)
+  ========================================================= */
+
+  function renderCards() {
+
+    if (!cardRows.length) {
+
+      cardsEl.innerHTML = `
+
+        <div class="empty">
+          لا توجد بطاقات بعد.
+        </div>
+
+      `;
+
+      return;
+    }
+
+
+    cardsEl.innerHTML =
+      cardRows
+        .map(
+          function (card) {
+
+            const order =
+              card.orders && card.orders.length
+                ? card.orders[0]
+                : null;
+
+
+            const design =
+              order && order.designs && order.designs.length
+                ? order.designs[0]
+                : null;
+
+
+            const designImage =
+              design && design.preview_url
+                ? design.preview_url
+                : '';
+
+
+            return `
+
+              <div
+                class="notice-box"
+                style="margin-bottom:12px;"
+              >
+
+                <div
+                  style="
+                    display:flex;
+                    gap:14px;
+                    align-items:flex-start;
+                    flex-wrap:wrap;
+                  "
+                >
+
+                  ${
+                    designImage
+
+                      ? `
+                        <div style="width:140px;flex:0 0 140px;">
+                          <img
+                            src="${escapeHtml(designImage)}"
+                            alt="التصميم"
+                            style="
+                              width:140px;
+                              height:140px;
+                              object-fit:cover;
+                              border-radius:12px;
+                              background:#fff;
+                            "
+                          >
+                        </div>
+                      `
+
+                      : ''
+                  }
+
+
+                  <div style="flex:1;min-width:220px;">
+
+                    <div style="font-weight:700;">
+                      ${escapeHtml(card.card_id || '')}
+                    </div>
+
+
+                    <div class="muted" style="margin-top:6px;">
+                      الحالة:
+                      ${escapeHtml(statusLabel(card.status))}
+                    </div>
+
+
+                    ${
+                      card.public_url
+
+                        ? `
+                          <div style="margin-top:10px;">
+                            <a
+                              class="btn primary"
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              href="${escapeHtml(card.public_url)}"
+                            >
+                              فتح البطاقة
+                            </a>
                           </div>
                         `
 
@@ -1004,11 +1160,9 @@
      RENDER MESSAGES
   ========================================================= */
 
-  function renderMessages(
-    messageRows
-  ) {
+  function renderMessages(messageRows) {
 
-    if (!messageRows.length) {
+    if (!messageRows || !messageRows.length) {
 
       myMessagesEl.innerHTML = `
 
@@ -1028,56 +1182,31 @@
           function (message) {
 
             const subject =
-              escapeHtml(
-                message.subject ||
-                'بدون موضوع'
-              );
-
+              escapeHtml(message.subject || 'بدون موضوع');
 
             const body =
-              escapeHtml(
-                message.body ||
-                ''
-              );
-
+              escapeHtml(message.body || '');
 
             const reply =
-              escapeHtml(
-                message.admin_reply ||
-                'بانتظار الرد'
-              );
+              escapeHtml(message.admin_reply || 'بانتظار الرد');
 
 
             return `
 
               <div
                 class="notice-box"
-                style="
-                  margin-bottom:8px;
-                "
+                style="margin-bottom:8px;"
               >
 
-                <b>
-                  ${subject}
-                </b>
+                <b>${subject}</b>
 
-                <div
-                  style="margin-top:6px"
-                >
+                <div style="margin-top:6px;">
                   ${body}
                 </div>
 
-                <div
-                  class="muted"
-                  style="
-                    margin-top:8px;
-                  "
-                >
-
+                <div class="muted" style="margin-top:8px;">
                   الرد:
-
                   ${reply}
-
                 </div>
 
               </div>
@@ -1104,27 +1233,17 @@
 
       if (!user) {
 
-        toast(
-          'يجب تسجيل الدخول أولًا',
-          'error'
-        );
+        toast('يجب تسجيل الدخول أولًا', 'error');
 
         return;
       }
 
 
-      saveProfileBtn.disabled =
-        true;
-
-      saveProfileBtn.textContent =
-        'جاري الحفظ...';
+      saveProfileBtn.disabled = true;
+      saveProfileBtn.textContent = 'جاري الحفظ...';
 
 
       try {
-
-        /* =========================
-           بيانات المستخدم
-        ========================= */
 
         const fullName =
           fullNameEl.value.trim();
@@ -1147,233 +1266,122 @@
 
         if (!fullName) {
 
-          toast(
-            'اكتب الاسم أولًا',
-            'error'
-          );
+          toast('اكتب الاسم أولًا', 'error');
 
           return;
         }
 
-
-        /* =========================
-           تحديث customers
-        ========================= */
 
         const customerResult =
           await sb
             .from('customers')
-            .update({
-              full_name:
-                fullName
-            })
-            .eq(
-              'id',
-              user.id
-            );
+            .update({ full_name: fullName })
+            .eq('id', user.id);
 
 
-        if (
-          customerResult.error
-        ) {
+        if (customerResult.error) {
 
-          console.error(
-            'Customer Update Error:',
-            customerResult.error
-          );
+          console.error('Customer Update Error:', customerResult.error);
 
-
-          toast(
-            customerResult.error.message,
-            'error'
-          );
+          toast(customerResult.error.message, 'error');
 
           return;
         }
 
 
-        /* =========================
-           الصورة
-        ========================= */
-
-        let photoUrl =
-          null;
-
+        let photoUrl = null;
 
         const file =
-          photoEl.files &&
-          photoEl.files[0];
+          photoEl.files && photoEl.files[0];
 
 
         if (file) {
 
           if (
             !window.zoma ||
-            typeof window.zoma.uploadPhoto !==
-              'function'
+            typeof window.zoma.uploadPhoto !== 'function'
           ) {
 
-            toast(
-              'رفع الصور غير متاح في app.js',
-              'error'
-            );
+            toast('رفع الصور غير متاح في app.js', 'error');
 
             return;
           }
 
 
           photoUrl =
-            await window.zoma.uploadPhoto(
-              file
-            );
+            await window.zoma.uploadPhoto(file);
 
         }
 
 
-        /* =========================
-           هل توجد بطاقة؟
-        ========================= */
-
         const cardResult =
           await sb
             .from('cards')
-            .select(
-              'id,created_at'
-            )
-            .eq(
-              'customer_id',
-              user.id
-            )
-            .order(
-              'created_at',
-              {
-                ascending: false
-              }
-            )
+            .select('id,created_at')
+            .eq('customer_id', user.id)
+            .order('created_at', { ascending: false })
             .limit(1);
 
 
         if (cardResult.error) {
 
-          console.error(
-            'Card lookup error:',
-            cardResult.error
-          );
+          console.error('Card lookup error:', cardResult.error);
 
-          /*
-           * حتى لو فشل البحث عن البطاقة،
-           * اسم العميل تم حفظه بالفعل.
-           */
-
-          toast(
-            'تم حفظ الاسم، لكن تعذر تحديث بيانات البطاقة',
-            'error'
-          );
+          toast('تم حفظ الاسم، لكن تعذر تحديث بيانات البطاقة', 'error');
 
           return;
         }
 
 
         const currentCard =
-          cardResult.data &&
-          cardResult.data[0];
+          cardResult.data && cardResult.data[0];
 
-
-        /* =========================
-           لا توجد بطاقة
-        ========================= */
 
         if (!currentCard) {
-
-          /*
-           * لا يمكن تخزين Facebook/WhatsApp والصورة
-           * داخل profiles بدون card_id.
-           *
-           * لكن الاسم تم حفظه داخل customers.
-           */
 
           profileCardHintEl.textContent =
             'تم حفظ الاسم. سيتم ربط Facebook وTikTok وWhatsApp والصورة تلقائيًا عند إصدار البطاقة.';
 
-
-          toast(
-            'تم حفظ الاسم بنجاح',
-            'success'
-          );
-
+          toast('تم حفظ الاسم بنجاح', 'success');
 
           return;
         }
 
 
-        /* =========================
-           Profile Payload
-        ========================= */
-
         const profilePayload = {
 
-          card_id:
-            currentCard.id,
-
-          full_name:
-            fullName,
-
-          facebook_url:
-            facebook,
-
-          tiktok_url:
-            tiktok,
-
-          whatsapp_1:
-            whatsapp1,
-
-          whatsapp_2:
-            whatsapp2,
-
-          show_whatsapp_2:
-            showWhatsapp2
+          card_id: currentCard.id,
+          full_name: fullName,
+          facebook_url: facebook,
+          tiktok_url: tiktok,
+          whatsapp_1: whatsapp1,
+          whatsapp_2: whatsapp2,
+          show_whatsapp_2: showWhatsapp2
 
         };
 
 
         if (photoUrl) {
 
-          profilePayload.photo_url =
-            photoUrl;
+          profilePayload.photo_url = photoUrl;
 
         }
 
-
-        /* =========================
-           Upsert Profile
-        ========================= */
 
         const profileResult =
           await sb
             .from('profiles')
             .upsert(
               profilePayload,
-              {
-                onConflict:
-                  'card_id'
-              }
+              { onConflict: 'card_id' }
             );
 
 
-        if (
-          profileResult.error
-        ) {
+        if (profileResult.error) {
 
-          console.error(
-            'Profile Upsert Error:',
-            profileResult.error
-          );
+          console.error('Profile Upsert Error:', profileResult.error);
 
-
-          toast(
-            profileResult.error.message,
-            'error'
-          );
+          toast(profileResult.error.message, 'error');
 
           return;
         }
@@ -1383,44 +1391,28 @@
           'تم حفظ البيانات وربطها بالبطاقة بنجاح.';
 
 
-        helloEl.textContent =
-          fullName;
+        helloEl.textContent = fullName;
 
 
-        toast(
-          'تم حفظ البيانات بنجاح',
-          'success'
-        );
+        toast('تم حفظ البيانات بنجاح', 'success');
 
-
-        /*
-         * تحديث الشاشة
-         */
 
         await refreshDashboard();
 
 
       } catch (error) {
 
-        console.error(
-          'Save Profile Error:',
-          error
-        );
-
+        console.error('Save Profile Error:', error);
 
         toast(
-          error.message ||
-          'حدث خطأ أثناء حفظ البيانات',
+          error.message || 'حدث خطأ أثناء حفظ البيانات',
           'error'
         );
 
       } finally {
 
-        saveProfileBtn.disabled =
-          false;
-
-        saveProfileBtn.textContent =
-          'حفظ التعديلات';
+        saveProfileBtn.disabled = false;
+        saveProfileBtn.textContent = 'حفظ التعديلات';
 
       }
 
@@ -1439,9 +1431,7 @@
       event.preventDefault();
 
 
-      if (!user) {
-        return;
-      }
+      if (!user) return;
 
 
       const subject =
@@ -1453,10 +1443,7 @@
 
       if (!subject || !body) {
 
-        toast(
-          'اكتب الموضوع والرسالة أولًا',
-          'error'
-        );
+        toast('اكتب الموضوع والرسالة أولًا', 'error');
 
         return;
       }
@@ -1468,63 +1455,38 @@
           await sb
             .from('messages')
             .insert({
-
-              customer_id:
-                user.id,
-
-              subject:
-                subject,
-
-              body:
-                body
-
+              customer_id: user.id,
+              subject: subject,
+              body: body
             });
 
 
         if (result.error) {
 
-          toast(
-            result.error.message,
-            'error'
-          );
+          toast(result.error.message, 'error');
 
           return;
         }
 
 
-        msgSubjectEl.value =
-          '';
-
-        msgBodyEl.value =
-          '';
+        msgSubjectEl.value = '';
+        msgBodyEl.value = '';
 
 
-        toast(
-          'تم إرسال الرسالة',
-          'success'
-        );
+        toast('تم إرسال الرسالة', 'success');
 
 
-        const messages =
-          await loadMessages();
+        messageRows = await loadMessages();
 
-
-        renderMessages(
-          messages
-        );
+        renderMessages(messageRows);
 
 
       } catch (error) {
 
-        console.error(
-          'Send Message Error:',
-          error
-        );
-
+        console.error('Send Message Error:', error);
 
         toast(
-          error.message ||
-          'حدث خطأ أثناء إرسال الرسالة',
+          error.message || 'حدث خطأ أثناء إرسال الرسالة',
           'error'
         );
 
@@ -1548,37 +1510,24 @@
     ] = await Promise.all([
 
       loadCustomer(),
-
       loadCards(),
-
       loadOrders(),
-
       loadMessages()
 
     ]);
 
 
-    loadProfileIntoForm(
-      customer,
-      cards
-    );
+    loadProfileIntoForm(customer, cards);
 
 
-    cardRows =
-      cards;
-
-
-    orderRows =
-      orders;
+    cardRows = cards;
+    orderRows = orders;
+    messageRows = messages;
 
 
     renderCards();
-
     renderOrders();
-
-    renderMessages(
-      messages
-    );
+    renderMessages(messages);
 
   }
 
@@ -1593,26 +1542,21 @@
 
       if (
         !window.zoma ||
-        typeof window.zoma.currentUser !==
-          'function'
+        typeof window.zoma.currentUser !== 'function'
       ) {
 
-        console.error(
-          'app.js غير محمل بشكل صحيح.'
-        );
+        console.error('app.js غير محمل بشكل صحيح.');
 
         return;
       }
 
 
-      user =
-        await window.zoma.currentUser();
+      user = await window.zoma.currentUser();
 
 
       if (!user) {
 
-        window.location.href =
-          'login.html';
+        window.location.href = 'login.html';
 
         return;
       }
@@ -1623,15 +1567,10 @@
 
     } catch (error) {
 
-      console.error(
-        'Customer Dashboard Error:',
-        error
-      );
-
+      console.error('Customer Dashboard Error:', error);
 
       toast(
-        error.message ||
-        'حدث خطأ أثناء تحميل لوحة العميل',
+        error.message || 'حدث خطأ أثناء تحميل لوحة العميل',
         'error'
       );
 
@@ -1639,10 +1578,6 @@
 
   }
 
-
-  /* =========================================================
-     START
-  ========================================================= */
 
   boot();
 
