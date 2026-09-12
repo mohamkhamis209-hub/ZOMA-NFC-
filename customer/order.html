@@ -802,26 +802,7 @@
 
         }
 
-
-        /* رقم الطلب */
-
-        let orderNumber;
-
-        if (
-          window.zoma &&
-          typeof window.zoma.orderNo === 'function'
-        ) {
-
-          orderNumber = window.zoma.orderNo();
-
-        } else {
-
-          orderNumber = 'ZOMA-' + Date.now();
-
-        }
-
-
-        /* محاولة RPC أولًا */
+        /* إنشاء الطلب من خلال RPC الآمن فقط */
 
         let orderData = null;
 
@@ -843,63 +824,12 @@
             p_customer_notes: notes
 
           });
-
-
-        if (!rpcError && rpcOrder) {
-
-          orderData = rpcOrder;
-
-        } else {
-
-          /* Fallback: insert مباشر */
-
-          console.warn('RPC create order failed; using direct insert:', rpcError);
-
-
-          const fallbackInsert =
-            await sb
-              .from('orders')
-              .insert({
-
-                order_number: orderNumber,
-
-                customer_id: currentUser.id,   /* ✅ تم إصلاح الخطأ */
-
-                design_id: selectedDesign.id,
-
-                total_price: Number(selectedDesign.price || 0),
-
-                status: 'pending',
-
-                customer_name: customerName || null,
-
-                phone: phone || null,
-
-                shipping_governorate: governorate || null,
-
-                shipping_city: city || null,
-
-                shipping_address: address || null,
-
-                customer_notes: notes || null
-
-              })
-              .select('*')
-              .single();
-
-
-          if (fallbackInsert.error) {
-
-            console.error('Direct create order error:', fallbackInsert.error);
-
-            throw fallbackInsert.error;
-
-          }
-
-
-          orderData = fallbackInsert.data;
-
+        if (rpcError || !rpcOrder) {
+          console.error('Create order RPC error:', rpcError);
+          throw (rpcError || new Error('تعذر إنشاء الطلب'));
         }
+
+        orderData = rpcOrder;
 
 
         /* سجل النشاط */
@@ -917,7 +847,7 @@
               'order',
               orderData.id,
               {
-                order_number: orderNumber,
+                order_number: orderData.order_number,
                 design_id: selectedDesign.id
               }
             );

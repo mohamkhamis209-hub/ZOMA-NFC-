@@ -26,3 +26,13 @@ ZOMA Smart Card - Full GitHub Pages + Supabase build
 
 
 FIX 2026-09-12: Removed references to nonexistent designs.image_url/designs.image columns; customer order creation uses zoma_create_order RPC; admin orders query uses explicit existing columns.
+
+
+=== Database hardening (corrected build) ===
+1. In Supabase SQL Editor, run sql/schema.sql from top to bottom.
+2. Do not run sql/after-schema.sql; it is intentionally deprecated and empty.
+3. The schema now uses permission-aware RLS, customer-safe order/message/notification access, and RPC-only card activation/order creation.
+4. Existing admin accounts receive default permissions automatically. Owner accounts retain full access.
+5. The frontend no longer falls back to direct order insertion and card issuance uses the secure RPC.
+6. Before production, review your existing database for duplicate/invalid data if this is an upgrade rather than a new project.
+7. Optional: run sql/verification.sql after the schema to inspect tables, RPCs, RLS policies, and basic data integrity.

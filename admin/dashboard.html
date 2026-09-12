@@ -1297,109 +1297,33 @@
   async function createCardForOrder(order) {
 
     try {
+      if (!order) return { success: false, error: 'الطلب غير موجود' };
 
-      if (!order) {
-        return { success: false, error: 'الطلب غير موجود' };
+      const siteUrl = (window.ZOMA_CONFIG && window.ZOMA_CONFIG.SITE_URL) || (location.origin + '/');
+      const { data, error } = await sb.rpc('zoma_issue_card', {
+        p_order_id: order.id,
+        p_site_url: siteUrl
+      });
+
+      if (error || !data) {
+        return { success: false, error: (error && error.message) || 'تعذر إصدار البطاقة' };
       }
-
-
-      /* هل توجد بطاقة بالفعل؟ */
-
-      const existingResult = await sb
-        .from('cards')
-        .select('id,card_id,status,public_url')
-        .eq('order_id', order.id)
-        .maybeSingle();
-
-
-      if (existingResult.error) {
-        return { success: false, error: existingResult.error.message };
-      }
-
-
-      if (existingResult.data) {
-        return { success: true, card: existingResult.data };
-      }
-
-
-      /* بيانات البطاقة */
-
-      const cardId = generateCardId();
-      const publicUrl = generatePublicUrl(cardId);
-
-
-      /* إنشاء البطاقة */
-
-      const cardResult = await sb
-        .from('cards')
-        .insert({
-          customer_id: order.customer_id,
-          order_id: order.id,
-          card_id: cardId,
-          public_url: publicUrl,
-          status: 'unactivated'
-        })
-        .select()
-        .single();
-
-
-      if (cardResult.error) {
-        return { success: false, error: cardResult.error.message };
-      }
-
-
-      /* إنشاء/تحديث Profile */
-
-      const customerName = order.customer_name || '';
-
-
-      const profileResult = await sb
-        .from('profiles')
-        .upsert(
-          {
-            card_id: cardResult.data.id,
-            full_name: customerName
-          },
-          { onConflict: 'card_id' }
-        );
-
-
-      if (profileResult.error) {
-        /* لا نوقف العملية، لكن نسجّل الخطأ */
-        console.warn('Profile Upsert Error:', profileResult.error);
-      }
-
-
-      /* سجل النشاط */
 
       try {
-
-        await logAction('issue_card', 'card', cardResult.data.id, {
-          card_id: cardId,
+        await logAction('issue_card', 'card', data.id, {
+          card_id: data.card_id,
           order_id: order.id
         });
-
       } catch (logError) {
-
-        console.warn('Card log error:', logError);
-
+        console.warn('Audit log error:', logError);
       }
 
-
-      return { success: true, card: cardResult.data };
-
-
+      return { success: true, card: data };
     } catch (error) {
-
-      return {
-        success: false,
-        error: error.message || 'حدث خطأ أثناء إنشاء البطاقة'
-      };
-
+      console.error('Create Card Error:', error);
+      return { success: false, error: error.message || 'تعذر إصدار البطاقة' };
     }
-
   }
-
 
   /* =========================================================
      ISSUE CARD MANUALLY
