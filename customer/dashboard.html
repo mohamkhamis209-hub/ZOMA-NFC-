@@ -666,649 +666,81 @@
   ========================================================= */
 
   async function loadCards() {
-
-    const result =
-      await sb
-        .from('cards')
-        .select(
-          `
-          *,
-          orders(
-            order_number,
-            status,
-            total_price,
-            designs(
-              name,
-              
-              preview_url
-            )
-          ),
-          profiles(*)
-          `
-        )
-        .eq(
-          'customer_id',
-          user.id
-        )
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        );
-
-
-    /*
-     * لو استعلام التصميم بالصورة فشل لأن أعمدة
-     * الصور غير موجودة في قاعدة البيانات،
-     * نعيد الاستعلام بدون أعمدة الصور.
-     */
+    // Read cards without PostgREST relationship embedding first.
+    // This avoids 400 errors when the Supabase schema cache has stale relationships.
+    const result = await sb.from('cards')
+      .select('id,card_id,customer_id,order_id,public_url,status,created_at,updated_at')
+      .eq('customer_id', user.id)
+      .order('created_at', { ascending: false });
 
     if (result.error) {
-
-      console.warn(
-        'Cards query with preview fields failed:',
-        result.error
-      );
-
-
-      const fallback =
-        await sb
-          .from('cards')
-          .select(
-            `
-            *,
-            orders(
-              order_number,
-              status,
-              total_price,
-              designs(name)
-            ),
-            profiles(*)
-            `
-          )
-          .eq(
-            'customer_id',
-            user.id
-          )
-          .order(
-            'created_at',
-            {
-              ascending: false
-            }
-          );
-
-
-      if (fallback.error) {
-
-        console.error(
-          'Cards fallback error:',
-          fallback.error
-        );
-
-        return [];
-
-      }
-
-
-      return fallback.data || [];
-
+      console.error('Cards query:', result.error);
+      return [];
     }
 
+    const rows = result.data || [];
+    if (!rows.length) return [];
 
-    return result.data || [];
+    const orderIds = rows.map(x => x.order_id).filter(Boolean);
+    const cardIds = rows.map(x => x.id).filter(Boolean);
 
+    const [ordersRes, profilesRes] = await Promise.all([
+      orderIds.length
+        ? sb.from('orders').select('id,order_number,status,total_price,design_id,created_at').in('id', orderIds)
+        : Promise.resolve({data: [], error: null}),
+      cardIds.length
+        ? sb.from('profiles').select('*').in('card_id', cardIds)
+        : Promise.resolve({data: [], error: null})
+    ]);
+
+    let designsRes = {data: [], error: null};
+    const designIds = (ordersRes.data || []).map(x => x.design_id).filter(Boolean);
+    if (designIds.length) {
+      designsRes = await sb.from('designs').select('id,name,design_code,design_type,template_config,preview_url').in('id', designIds);
+    }
+
+    const ordersById = Object.fromEntries((ordersRes.data || []).map(x => [x.id, x]));
+    const profilesByCard = Object.fromEntries((profilesRes.data || []).map(x => [x.card_id, x]));
+    const designsById = Object.fromEntries((designsRes.data || []).map(x => [x.id, x]));
+
+    return rows.map(card => {
+      const order = ordersById[card.order_id] || null;
+      return {
+        ...card,
+        orders: order ? [{ ...order, designs: order.design_id && designsById[order.design_id] ? [designsById[order.design_id]] : [] }] : [],
+        profiles: profilesByCard[card.id] ? [profilesByCard[card.id]] : []
+      };
+    });
   }
-
 
   /* =========================================================
      LOAD ORDERS
   ========================================================= */
 
   async function loadOrders() {
-
-    const result =
-      await sb
-        .from('orders')
-        .select(
-          `
-          *,
-          designs(
-            name,
-            
-            preview_url
-          )
-          `
-        )
-        .eq(
-          'customer_id',
-          user.id
-        )
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        );
-
+    // Do not embed designs here. Fetch the order rows first, then designs separately.
+    const result = await sb.from('orders')
+      .select('id,order_number,customer_id,design_id,total_price,status,customer_name,phone,shipping_governorate,shipping_city,shipping_address,customer_notes,admin_notes,created_at,updated_at')
+      .eq('customer_id', user.id)
+      .order('created_at', { ascending: false });
 
     if (result.error) {
-
-      console.warn(
-        'Orders query with preview fields failed:',
-        result.error
-      );
-
-
-      const fallback =
-        await sb
-          .from('orders')
-          .select(
-            `
-            *,
-            designs(name)
-            `
-          )
-          .eq(
-            'customer_id',
-            user.id
-          )
-          .order(
-            'created_at',
-            {
-              ascending: false
-            }
-          );
-
-
-      if (fallback.error) {
-
-        console.error(
-          'Orders fallback error:',
-          fallback.error
-        );
-
-        return [];
-
-      }
-
-
-      return fallback.data || [];
-
-    }
-
-
-    return result.data || [];
-
-  }
-
-
-  /* =========================================================
-     LOAD MESSAGES
-  ========================================================= */
-
-  async function loadMessages() {
-
-    const result =
-      await sb
-        .from('messages')
-        .select('*')
-        .eq(
-          'customer_id',
-          user.id
-        )
-        .order(
-          'created_at',
-          {
-            ascending: false
-          }
-        );
-
-
-    if (result.error) {
-
-      console.error(
-        'Messages Error:',
-        result.error
-      );
-
+      console.error('Orders query:', result.error);
       return [];
-
     }
 
-
-    return result.data || [];
-
-  }
-
-
-  /* =========================================================
-     LOAD PROFILE DATA
-  ========================================================= */
-
-  function loadProfileIntoForm(
-    customer,
-    cards
-  ) {
-
-    /*
-     * أولاً نضع بيانات العميل الأساسية.
-     */
-
-    fullNameEl.value =
-      customer?.full_name || '';
-
-
-    helloEl.textContent =
-      customer?.full_name || '';
-
-
-    /*
-     * نحاول أخذ أحدث Profile موجود.
-     */
-
-    let profile = null;
-
-
-    for (
-      let i = 0;
-      i < cards.length;
-      i++
-    ) {
-
-      if (
-        cards[i] &&
-        cards[i].profiles
-      ) {
-
-        if (
-          Array.isArray(
-            cards[i].profiles
-          )
-        ) {
-
-          if (
-            cards[i].profiles.length
-          ) {
-
-            profile =
-              cards[i].profiles[0];
-
-            break;
-
-          }
-
-        } else {
-
-          profile =
-            cards[i].profiles;
-
-          if (profile) {
-            break;
-          }
-
-        }
-
-      }
-
+    const rows = result.data || [];
+    const designIds = rows.map(x => x.design_id).filter(Boolean);
+    let designs = [];
+    if (designIds.length) {
+      const d = await sb.from('designs').select('id,name,design_code,design_type,template_config,preview_url').in('id', designIds);
+      if (!d.error) designs = d.data || [];
     }
-
-
-    /*
-     * لو يوجد Profile، نعوض به بيانات الفورم.
-     */
-
-    if (profile) {
-
-      fullNameEl.value =
-        profile.full_name ||
-        fullNameEl.value ||
-        '';
-
-
-      facebookUrlEl.value =
-        profile.facebook_url ||
-        '';
-
-
-      tiktokUrlEl.value =
-        profile.tiktok_url ||
-        '';
-
-
-      whatsapp1El.value =
-        profile.whatsapp_1 ||
-        '';
-
-
-      whatsapp2El.value =
-        profile.whatsapp_2 ||
-        '';
-
-
-      showWhatsapp2El.value =
-        String(
-          profile.show_whatsapp_2 !== false
-        );
-
-
-      profileCardHintEl.textContent =
-        'بياناتك مرتبطة بالبطاقة الحالية ويمكنك تعديلها في أي وقت.';
-
-    } else {
-
-      profileCardHintEl.textContent =
-        cards.length
-          ? 'سيتم حفظ البيانات على البطاقة الحالية.'
-          : 'يمكنك حفظ الاسم الآن، وسيتم ربط باقي بيانات البطاقة عند إصدار البطاقة.';
-
-    }
-
-  }
-
-
-  /* =========================================================
-     RENDER CARDS
-  ========================================================= */
-
-  function renderCards() {
-
-    if (!cardRows.length) {
-
-      cardsEl.innerHTML = `
-
-        <div class="empty">
-
-          <p>
-            لا توجد بطاقات حتى الآن.
-          </p>
-
-          <a
-            class="btn primary"
-            href="order.html"
-            style="margin-top:10px"
-          >
-            طلب بطاقة جديدة
-          </a>
-
-        </div>
-
-      `;
-
-      return;
-    }
-
-
-    cardsEl.innerHTML =
-      cardRows
-        .map(
-          function (card) {
-
-            const order =
-              card.orders || null;
-
-
-            const design =
-              order?.designs || null;
-
-
-            const designImage =
-              getDesignImage(
-                design
-              );
-
-
-            return `
-
-              <div
-                class="notice-box"
-                style="
-                  margin-bottom:12px;
-                  overflow:hidden;
-                "
-              >
-
-
-                ${
-                  designImage
-
-                    ? `
-                      <div
-                        style="
-                          margin-bottom:12px;
-                          text-align:center;
-                        "
-                      >
-
-                        <img
-                          src="${escapeHtml(
-                            designImage
-                          )}"
-                          alt="معاينة التصميم"
-                          style="
-                            width:100%;
-                            max-height:220px;
-                            object-fit:contain;
-                            border-radius:12px;
-                            background:#fff;
-                          "
-                        >
-
-                      </div>
-                    `
-
-                    : ''
-                }
-
-
-                <div>
-
-                  <b>
-                    ${escapeHtml(
-                      card.card_id ||
-                      'بطاقة'
-                    )}
-                  </b>
-
-                </div>
-
-
-                <div
-                  class="muted"
-                  style="margin-top:5px"
-                >
-
-                  الحالة:
-
-                  ${escapeHtml(
-                    statusLabel(
-                      card.status
-                    )
-                  )}
-
-                </div>
-
-
-                ${
-                  design?.name
-
-                    ? `
-                      <div
-                        class="muted"
-                        style="margin-top:5px"
-                      >
-                        التصميم:
-                        ${escapeHtml(
-                          design.name
-                        )}
-                      </div>
-                    `
-
-                    : ''
-                }
-
-
-                <div
-                  class="actions"
-                  style="margin-top:12px"
-                >
-
-                  ${
-                    card.public_url
-
-                      ? `
-                        <a
-                          class="btn primary"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          href="${escapeHtml(
-                            card.public_url
-                          )}"
-                        >
-                          فتح البطاقة
-                        </a>
-                      `
-
-                      : ''
-                  }
-
-
-                  ${
-                    card.public_url
-
-                      ? `
-                        <button
-                          class="btn"
-                          type="button"
-                          data-copy-card="${escapeHtml(
-                            card.id
-                          )}"
-                        >
-                          نسخ الرابط
-                        </button>
-                      `
-
-                      : ''
-                  }
-
-                </div>
-
-              </div>
-
-            `;
-
-          }
-        )
-        .join('');
-
-
-    document
-      .querySelectorAll(
-        '[data-copy-card]'
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            'click',
-            function () {
-
-              copyCardUrl(
-                button.dataset.copyCard
-              );
-
-            }
-          );
-
-        }
-      );
-
-  }
-
-
-  /* =========================================================
-     COPY CARD URL
-  ========================================================= */
-
-  async function copyCardUrl(id) {
-
-    const card =
-      cardRows.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
-
-
-    if (
-      !card ||
-      !card.public_url
-    ) {
-
-      toast(
-        'رابط البطاقة غير متوفر',
-        'error'
-      );
-
-      return;
-    }
-
-
-    try {
-
-      if (
-        navigator.clipboard &&
-        navigator.clipboard.writeText
-      ) {
-
-        await navigator.clipboard.writeText(
-          card.public_url
-        );
-
-      } else {
-
-        const temp =
-          document.createElement(
-            'textarea'
-          );
-
-        temp.value =
-          card.public_url;
-
-        document.body.appendChild(
-          temp
-        );
-
-        temp.select();
-
-        document.execCommand(
-          'copy'
-        );
-
-        temp.remove();
-
-      }
-
-
-      toast(
-        'تم نسخ الرابط',
-        'success'
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        error
-      );
-
-      toast(
-        'تعذر نسخ الرابط',
-        'error'
-      );
-
-    }
-
+    const byId = Object.fromEntries(designs.map(x => [x.id, x]));
+    return rows.map(order => ({
+      ...order,
+      designs: order.design_id && byId[order.design_id] ? [byId[order.design_id]] : []
+    }));
   }
 
 

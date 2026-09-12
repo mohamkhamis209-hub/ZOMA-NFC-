@@ -1070,8 +1070,16 @@
         ]);
 
 
-      const ordersResult =
-        results[0];
+      let ordersResult = results[0];
+
+      // If PostgREST rejects one of the legacy order columns, retry with only
+      // the guaranteed core columns so the Orders section never disappears.
+      if (ordersResult.error) {
+        const retry = await sb.from('orders')
+          .select('id,order_number,customer_id,design_id,total_price,status,created_at,updated_at')
+          .order('created_at', { ascending: false });
+        if (!retry.error) ordersResult = retry;
+      }
 
       const customersResult =
         results[1];

@@ -1238,15 +1238,26 @@
 
 
         if (orderResult.error) {
+          console.warn('RPC create order failed; trying direct orders insert:', orderResult.error);
+          const fallbackInsert = await sb.from('orders').insert({
+            order_number: 'ZM-' + Date.now(),
+            customer_id: user.id,
+            design_id: selectedDesign.id,
+            total_price: Number(selectedDesign.price || 0),
+            status: 'pending',
+            customer_name: customerName || null,
+            phone: phone || null,
+            shipping_governorate: governorate || null,
+            shipping_city: city || null,
+            shipping_address: address || null,
+            customer_notes: notes || null
+          }).select('*').single();
 
-          console.error(
-            'Create Order Error:',
-            orderResult.error
-          );
-
-
-          throw orderResult.error;
-
+          if (fallbackInsert.error) {
+            console.error('Direct create order error:', fallbackInsert.error);
+            throw fallbackInsert.error;
+          }
+          orderResult.data = fallbackInsert.data;
         }
 
 
