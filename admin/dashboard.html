@@ -1005,15 +1005,8 @@
 
           sb
             .from('orders')
-            .select(
-              '*,customers(full_name,phone),designs(name,preview_url,template_config),cards(id,card_id,status,public_url)'
-            )
-            .order(
-              'created_at',
-              {
-                ascending: false
-              }
-            ),
+            .select('*')
+            .order('created_at', { ascending: false }),
 
           sb
             .from('customers')
@@ -1661,13 +1654,16 @@
       }
 
 
-      let result;
-      if(status === 'confirmed') {
-        const rpc = await sb.rpc('zoma_confirm_order',{p_order_id:id,p_site_url:window.ZOMA_CONFIG.SITE_URL});
-        result = {error: rpc.error};
-      } else {
-        result = await sb.from('orders').update({status}).eq('id',id);
-      }
+      const result =
+        await sb
+          .from('orders')
+          .update({
+            status: status
+          })
+          .eq(
+            'id',
+            id
+          );
 
 
       if (result.error) {
@@ -1826,7 +1822,10 @@
 
 
     const designImage =
-      design.preview_url || '';
+      design.image_url ||
+      design.preview_url ||
+      design.image ||
+      '';
 
 
     modalBodyEl.innerHTML = `
@@ -2066,18 +2065,207 @@
   /* =========================================================
      CREATE CARD FOR ORDER
   ========================================================= */
-  async function createCardForOrder(order) {
-    if(!order) return {success:false,error:'الطلب غير موجود'};
-    try {
-      const {data,error}=await sb.rpc('zoma_issue_card',{p_order_id:order.id,p_site_url:window.ZOMA_CONFIG.SITE_URL});
-      if(error) return {success:false,error:error.message};
-      const card=Array.isArray(data)?data[0]:data;
-      if(!card) return {success:false,error:'تعذر إصدار البطاقة'};
-      return {success:true,card};
-    } catch(e){ return {success:false,error:e.message||'حدث خطأ أثناء إصدار البطاقة'}; }
-  }
 
-  window.createCardForOrder=createCardForOrder;
+  async function createCardForOrder(
+    order
+  ) {
+
+    try {
+
+      if (!order) {
+
+        return {
+          success: false,
+          error: 'الطلب غير موجود'
+        };
+
+      }
+
+
+      /* =========================
+         Check existing card
+      ========================= */
+
+      const existingResult =
+        await sb
+          .from('cards')
+          .select(
+            'id,card_id,status,public_url'
+          )
+          .eq(
+            'order_id',
+            order.id
+          )
+          .maybeSingle();
+
+
+      if (existingResult.error) {
+
+        return {
+          success: false,
+          error:
+            existingResult.error.message
+        };
+
+      }
+
+
+      if (
+        existingResult.data
+      ) {
+
+        return {
+          success: true,
+          card:
+            existingResult.data
+        };
+
+      }
+
+
+      /* =========================
+         Card ID + public URL
+      ========================= */
+
+      const cardId =
+        generateCardId();
+
+
+      const publicUrl =
+        generatePublicUrl(
+          cardId
+        );
+
+
+      /* =========================
+         Create Card
+      ========================= */
+
+      const cardResult =
+        await sb
+          .from('cards')
+          .insert({
+
+            customer_id:
+              order.customer_id,
+
+            order_id:
+              order.id,
+
+            card_id:
+              cardId,
+
+            public_url:
+              publicUrl,
+
+            status:
+              'unactivated'
+
+          })
+          .select()
+          .single();
+
+
+      if (cardResult.error) {
+
+        return {
+          success: false,
+          error:
+            cardResult.error.message
+        };
+
+      }
+
+
+      /* =========================
+         Create / Update Profile
+      ========================= */
+
+      const customerName =
+        order.customer_name ||
+        order.customers?.full_name ||
+        '';
+
+
+      const profileResult =
+        await sb
+          .from('profiles')
+          .upsert(
+            {
+              card_id:
+                cardResult.data.id,
+
+              full_name:
+                customerName
+
+            },
+            {
+              onConflict:
+                'card_id'
+            }
+          );
+
+
+      if (
+        profileResult.error
+      ) {
+
+        console.warn(
+          'Profile Upsert Error:',
+          profileResult.error
+        );
+
+      }
+
+
+      /* =========================
+         Log
+      ========================= */
+
+      try {
+
+        await logAction(
+          'issue_card',
+          'card',
+          cardResult.data.id,
+          {
+            card_id:
+              cardId,
+
+            order_id:
+              order.id
+          }
+        );
+
+      } catch (logError) {
+
+        console.warn(
+          'Card log error:',
+          logError
+        );
+
+      }
+
+
+      return {
+        success: true,
+        card:
+          cardResult.data
+      };
+
+
+    } catch (error) {
+
+      return {
+        success: false,
+        error:
+          error.message ||
+          'حدث خطأ أثناء إنشاء البطاقة'
+      };
+
+    }
+
+  }
 
 
   /* =========================================================
@@ -3913,14 +4101,165 @@
   ========================================================= */
 
   function renderDesigns() {
-    designsGridEl.innerHTML=designs.map(function(design){
-      const image=design.preview_url||'';
-      const template=design.design_type==='template'?templatePreviewHtml(design.template_config||{},'محمد خميس','Smart Card'):'';
-      return `<div class="panel design"><div class="design-preview" style="min-height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:14px">${image?`<img src="${escapeHtml(image)}" alt="${escapeHtml(design.name||'')}" style="width:100%;height:220px;object-fit:cover">`:(template||'<div class="muted">لا توجد معاينة</div>')}</div><h3>${escapeHtml(design.name||'')}</h3><p class="muted">${escapeHtml(design.design_code||'')} · ${design.design_type==='template'?'Template':'صورة'}</p><p>${money(design.price)}</p><div class="actions"><button class="btn" type="button" data-edit-design="${escapeHtml(design.id)}">تعديل</button><button class="btn" type="button" data-toggle-design="${escapeHtml(design.id)}">${design.is_available?'إيقاف':'تفعيل'}</button><button class="btn danger" type="button" data-delete-design="${escapeHtml(design.id)}">حذف</button></div></div>`;
-    }).join('')||'<div class="empty">لا توجد تصميمات.</div>';
-    document.querySelectorAll('[data-edit-design]').forEach(btn=>btn.addEventListener('click',()=>openDesignEditor(designs.find(d=>d.id===btn.dataset.editDesign))));
-    document.querySelectorAll('[data-toggle-design]').forEach(btn=>btn.addEventListener('click',()=>toggleDesign(btn.dataset.toggleDesign)));
-    document.querySelectorAll('[data-delete-design]').forEach(btn=>btn.addEventListener('click',()=>deleteDesign(btn.dataset.deleteDesign)));
+
+    designsGridEl.innerHTML =
+      designs.map(
+        function (design) {
+
+          const image =
+            design.image_url ||
+            design.preview_url ||
+            design.image ||
+            '';
+
+
+          return `
+
+            <div class="panel design">
+
+              <div
+                class="design-preview"
+                style="
+                  min-height:220px;
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  overflow:hidden;
+                  border-radius:14px;
+                "
+              >
+
+                ${
+                  image
+
+                    ? `
+                      <img
+                        src="${escapeHtml(
+                          image
+                        )}"
+                        alt="${escapeHtml(
+                          design.name ||
+                          ''
+                        )}"
+                        style="
+                          width:100%;
+                          height:220px;
+                          object-fit:cover;
+                        "
+                      >
+                    `
+
+                    : `
+                      <div class="muted">
+                        لا توجد معاينة
+                      </div>
+                    `
+                }
+
+              </div>
+
+
+              <h3>
+                ${escapeHtml(
+                  design.name ||
+                  ''
+                )}
+              </h3>
+
+
+              <p>
+                ${money(
+                  design.price
+                )}
+              </p>
+
+
+              <div class="actions">
+
+                <button
+                  class="btn"
+                  type="button"
+                  data-toggle-design="${escapeHtml(
+                    design.id
+                  )}"
+                >
+                  ${
+                    design.is_available
+                      ? 'إيقاف'
+                      : 'تفعيل'
+                  }
+                </button>
+
+
+                <button
+                  class="btn danger"
+                  type="button"
+                  data-delete-design="${escapeHtml(
+                    design.id
+                  )}"
+                >
+                  حذف
+                </button>
+
+              </div>
+
+            </div>
+
+          `;
+
+        }
+      ).join('') || `
+
+        <div class="empty">
+          لا توجد تصميمات.
+        </div>
+
+      `;
+
+
+    document
+      .querySelectorAll(
+        '[data-toggle-design]'
+      )
+      .forEach(
+        function (button) {
+
+          button.addEventListener(
+            'click',
+            function () {
+
+              toggleDesign(
+                button.dataset.toggleDesign
+              );
+
+            }
+          );
+
+        }
+      );
+
+
+    document
+      .querySelectorAll(
+        '[data-delete-design]'
+      )
+      .forEach(
+        function (button) {
+
+          button.addEventListener(
+            'click',
+            function () {
+
+              deleteDesign(
+                button.dataset.deleteDesign
+              );
+
+            }
+          );
+
+        }
+      );
+
   }
 
 
@@ -4032,76 +4371,234 @@
 
 
   /* =========================================================
-     ADD / EDIT DESIGN — TEMPLATE BUILDER
+     ADD DESIGN
   ========================================================= */
 
-  function templatePreviewHtml(cfg, name='محمد خميس', title='Smart Card') {
-    cfg = cfg || {};
-    const bg = escapeHtml(cfg.background || '#0b0b0d');
-    const accent = escapeHtml(cfg.accent || '#d4af37');
-    const text = escapeHtml(cfg.text || '#ffffff');
-    const radius = Math.max(8, Math.min(40, Number(cfg.radius || 24)));
-    const logo = cfg.logo_url ? `<img src="${escapeHtml(cfg.logo_url)}" style="width:42px;height:42px;object-fit:contain;border-radius:10px;background:rgba(255,255,255,.08)">` : '<div style="font-weight:900;font-size:22px">Z</div>';
-    const align = cfg.layout === 'center' ? 'center' : 'right';
-    return `<div style="width:min(100%,420px);aspect-ratio:1.586/1;border-radius:${radius}px;padding:22px;box-sizing:border-box;color:${text};background:${bg};position:relative;overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.22);text-align:${align};font-family:Arial,sans-serif">
-      ${cfg.background_url ? `<img src="${escapeHtml(cfg.background_url)}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22">` : ''}
-      <div style="position:relative;display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><div>${logo}</div><div style="font-size:11px;opacity:.7">ZOMA SMART CARD</div></div>
-      <div style="position:absolute;left:22px;bottom:20px;right:22px;z-index:2"><div style="font-size:24px;font-weight:900">${escapeHtml(name)}</div><div style="margin-top:4px;color:${accent};font-weight:700">${escapeHtml(title)}</div><div style="height:3px;width:58px;background:${accent};margin-top:10px;border-radius:99px"></div></div>
-    </div>`;
-  }
+  addDesignBtn.addEventListener(
+    'click',
+    function () {
 
-  function openDesignEditor(design=null) {
-    const cfg = Object.assign({background:'#0b0b0d',accent:'#d4af37',text:'#ffffff',layout:'classic',radius:24,logo_url:'',background_url:''}, design?.template_config || {});
-    modalTitleEl.textContent = design ? 'تعديل التصميم' : 'إضافة تصميم احترافي';
-    modalBodyEl.innerHTML = `
-      <form class="form" id="designEditorForm">
-        <div class="grid-2">
-          <div class="field"><label>اسم التصميم</label><input id="dtName" required value="${escapeHtml(design?.name||'')}"></div>
-          <div class="field"><label>السعر</label><input id="dtPrice" type="number" min="0" step="0.01" required value="${Number(design?.price||0)}"></div>
-        </div>
-        <div class="grid-2">
-          <div class="field"><label>كود التصميم</label><input id="dtCode" value="${escapeHtml(design?.design_code||'') }" placeholder="DES-001"></div>
-          <div class="field"><label>نوع التصميم</label><select id="dtType"><option value="template" ${design?.design_type!=='image'?'selected':''}>Template قابل للتعديل</option><option value="image" ${design?.design_type==='image'?'selected':''}>صورة جاهزة</option></select></div>
-        </div>
-        <div class="grid-2">
-          <div class="field"><label>لون الخلفية</label><input id="dtBg" type="color" value="${escapeHtml(cfg.background)}"></div>
-          <div class="field"><label>اللون الأساسي</label><input id="dtAccent" type="color" value="${escapeHtml(cfg.accent)}"></div>
-          <div class="field"><label>لون النص</label><input id="dtText" type="color" value="${escapeHtml(cfg.text)}"></div>
-          <div class="field"><label>التخطيط</label><select id="dtLayout"><option value="classic" ${cfg.layout==='classic'?'selected':''}>Classic</option><option value="center" ${cfg.layout==='center'?'selected':''}>Center</option><option value="business" ${cfg.layout==='business'?'selected':''}>Business</option></select></div>
-        </div>
-        <div class="grid-2">
-          <div class="field"><label>رابط الشعار (اختياري)</label><input id="dtLogo" type="url" value="${escapeHtml(cfg.logo_url||'')}"></div>
-          <div class="field"><label>رابط خلفية (اختياري)</label><input id="dtBgUrl" type="url" value="${escapeHtml(cfg.background_url||'')}"></div>
-        </div>
-        <div class="field"><label>صورة معاينة التصميم (اختياري)</label><input id="dtImage" type="file" accept="image/*"></div>
-        <div class="notice-box"><b>المعاينة المباشرة</b><div id="templateLivePreview" style="margin-top:12px">${templatePreviewHtml(cfg)}</div></div>
-        <button class="btn primary" type="submit">${design?'حفظ التعديلات':'حفظ التصميم'}</button>
-      </form>`;
-    modalEl.classList.add('show');
-    const ids=['dtBg','dtAccent','dtText','dtLayout','dtLogo','dtBgUrl'];
-    const refresh=()=>{const c={background:dtBg.value,accent:dtAccent.value,text:dtText.value,layout:dtLayout.value,radius:24,logo_url:dtLogo.value,background_url:dtBgUrl.value}; templateLivePreview.innerHTML=templatePreviewHtml(c);};
-    ids.forEach(id=>document.getElementById(id).addEventListener('input',refresh));
-    document.getElementById('designEditorForm').addEventListener('submit',e=>saveDesign(e,design));
-  }
+      modalTitleEl.textContent =
+        'إضافة تصميم';
 
-  addDesignBtn.addEventListener('click',()=>openDesignEditor());
 
-  async function saveDesign(event, design) {
+      modalBodyEl.innerHTML = `
+
+        <form
+          class="form"
+          id="createDesignForm"
+        >
+
+          <div class="field">
+
+            <label for="dn">
+              الاسم
+            </label>
+
+            <input
+              id="dn"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="dp">
+              السعر
+            </label>
+
+            <input
+              id="dp"
+              type="number"
+              min="0"
+              step="0.01"
+              required
+            >
+
+          </div>
+
+
+          <div class="field">
+
+            <label for="di">
+              رابط صورة التصميم
+            </label>
+
+            <input
+              id="di"
+              type="url"
+              placeholder="https://..."
+            >
+
+          </div>
+
+
+          <div class="notice-box">
+
+            يمكنك ترك رابط الصورة فارغًا،
+            لكن الأفضل إضافة صورة حتى تظهر
+            معاينة التصميم للعميل.
+
+          </div>
+
+
+          <button
+            class="btn primary"
+            type="submit"
+          >
+            إضافة
+          </button>
+
+        </form>
+
+      `;
+
+
+      modalEl.classList.add('show');
+
+
+      const form =
+        document.getElementById(
+          'createDesignForm'
+        );
+
+
+      form.addEventListener(
+        'submit',
+        createDesign
+      );
+
+    }
+  );
+
+
+  /* =========================================================
+     CREATE DESIGN
+  ========================================================= */
+
+  async function createDesign(
+    event
+  ) {
+
     event.preventDefault();
-    const name=dtName.value.trim(), price=Number(dtPrice.value||0), type=dtType.value;
-    let imageUrl=design?.preview_url||'';
-    const file=dtImage.files?.[0];
-    try { if(file) imageUrl=await window.zoma.uploadDesignImage(file); } catch(e){ toast(e.message,'error'); return; }
-    const code=(dtCode.value.trim() || ('DES-'+crypto.randomUUID().slice(0,6).toUpperCase())).toUpperCase();
-    const template_config={background:dtBg.value,accent:dtAccent.value,text:dtText.value,layout:dtLayout.value,radius:24,logo_url:dtLogo.value.trim(),background_url:dtBgUrl.value.trim()};
-    const payload={design_code:code,name,price,design_type:type,template_config,preview_url:imageUrl||null,is_available:true,nfc_available:true,qr_available:true};
-    const result=design ? await sb.from('designs').update(payload).eq('id',design.id) : await sb.from('designs').insert(payload);
-    if(result.error){toast(result.error.message,'error');return;}
-    toast(design?'تم تعديل التصميم':'تمت إضافة التصميم','success'); closeModal(); await load();
-  }
-  window.createDesign=saveDesign;
-  window.editDesign=openDesignEditor;
 
+
+    const nameEl =
+      document.getElementById('dn');
+
+    const priceEl =
+      document.getElementById('dp');
+
+    const imageEl =
+      document.getElementById('di');
+
+
+    const designCode =
+      'DES-' +
+      Math.random()
+        .toString(36)
+        .slice(2, 7)
+        .toUpperCase();
+
+
+    const imageUrl =
+      imageEl.value.trim();
+
+
+    const payload = {
+
+      design_code:
+        designCode,
+
+      name:
+        nameEl.value.trim(),
+
+      price:
+        Number(
+          priceEl.value
+        ),
+
+      is_available:
+        true,
+
+      nfc_available:
+        true,
+
+      qr_available:
+        true
+
+    };
+
+
+    /*
+     * نضع الصورة في image_url
+     * إذا كان العمود موجودًا.
+     */
+
+    if (imageUrl) {
+      payload.image_url =
+        imageUrl;
+    }
+
+
+    let result =
+      await sb
+        .from('designs')
+        .insert(payload);
+
+
+    /*
+     * لو image_url غير موجود في الجدول
+     * نحاول إنشاء التصميم بدون الصورة.
+     */
+
+    if (
+      result.error &&
+      imageUrl &&
+      /image_url|column/i.test(
+        result.error.message || ''
+      )
+    ) {
+
+      delete payload.image_url;
+
+
+      result =
+        await sb
+          .from('designs')
+          .insert(payload);
+
+    }
+
+
+    if (result.error) {
+
+      toast(
+        result.error.message,
+        'error'
+      );
+
+      return;
+    }
+
+
+    toast(
+      'تمت إضافة التصميم',
+      'success'
+    );
+
+
+    closeModal();
+
+    await load();
+
+  }
+
+
+  window.createDesign =
+    createDesign;
 
 
   /* =========================================================

@@ -589,7 +589,10 @@
 
 
     return (
-      design.preview_url || ''
+      design.image_url ||
+      design.preview_url ||
+      design.image ||
+      ''
     );
 
   }
@@ -678,10 +681,9 @@
             total_price,
             designs(
               name,
-              design_code,
+              image_url,
               preview_url,
-              design_type,
-              template_config
+              image
             )
           ),
           profiles(*)
@@ -776,8 +778,9 @@
           *,
           designs(
             name,
+            image_url,
             preview_url,
-            template_config
+            image
           )
           `
         )

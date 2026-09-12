@@ -672,7 +672,14 @@
     let result =
       await sb
         .from('designs')
-        .select('*')
+        .select(
+          `
+          *,
+          image_url,
+          preview_url,
+          image
+          `
+        )
         .eq(
           'is_available',
           true
@@ -832,7 +839,10 @@
 
 
     return (
-      design.preview_url || ''
+      design.image_url ||
+      design.preview_url ||
+      design.image ||
+      ''
     );
 
   }
@@ -1177,19 +1187,67 @@
          * إنشاء الطلب
          */
 
-        const orderResult = await sb.rpc('zoma_create_order',{
-          p_design_id:selectedDesign.id,
-          p_customer_name:customerName,
-          p_phone:phone,
-          p_governorate:governorate,
-          p_city:city,
-          p_address:address,
-          p_notes:notes,
-          p_order_number:(window.zoma && window.zoma.orderNo ? window.zoma.orderNo() : 'ZOMA-'+Date.now())
-        });
-        if(orderResult.error){ throw orderResult.error; }
-        const createdOrder=orderResult.data;
-        if(!createdOrder || !createdOrder.id){ throw new Error('تعذر إنشاء الطلب'); }
+        const orderPayload = {
+
+          customer_id:
+            currentUser.id,
+
+          design_id:
+            selectedDesign.id,
+
+          order_number:
+            orderNumber,
+
+          total_price:
+            Number(
+              selectedDesign.price || 0
+            ),
+
+          customer_name:
+            customerName,
+
+          phone:
+            phone,
+
+          shipping_governorate:
+            governorate,
+
+          shipping_city:
+            city,
+
+          shipping_address:
+            address,
+
+          customer_notes:
+            notes,
+
+          status:
+            'pending'
+
+        };
+
+
+        const orderResult =
+          await sb
+            .from('orders')
+            .insert(
+              orderPayload
+            )
+            .select()
+            .single();
+
+
+        if (orderResult.error) {
+
+          console.error(
+            'Create Order Error:',
+            orderResult.error
+          );
+
+
+          throw orderResult.error;
+
+        }
 
 
         /*
@@ -1207,10 +1265,10 @@
             await window.zoma.log(
               'create_order',
               'order',
-              createdOrder.id,
+              orderResult.data.id,
               {
                 order_number:
-                  createdOrder.order_number,
+                  orderNumber,
 
                 design_id:
                   selectedDesign.id
