@@ -127,35 +127,19 @@
 
         <div class="actions">
 
-          <button
-            class="btn primary"
-            data-jump="orders"
-            type="button"
-          >
+          <button class="btn primary" data-jump="orders" type="button">
             إدارة الطلبات
           </button>
 
-          <button
-            class="btn"
-            data-jump="customers"
-            type="button"
-          >
+          <button class="btn" data-jump="customers" type="button">
             العملاء
           </button>
 
-          <button
-            class="btn"
-            data-jump="cards"
-            type="button"
-          >
+          <button class="btn" data-jump="cards" type="button">
             البطاقات
           </button>
 
-          <button
-            class="btn"
-            data-jump="designs"
-            type="button"
-          >
+          <button class="btn" data-jump="designs" type="button">
             التصميمات
           </button>
 
@@ -272,11 +256,7 @@
 
           <h2>البطاقات</h2>
 
-          <button
-            class="btn primary"
-            id="newCard"
-            type="button"
-          >
+          <button class="btn primary" id="newCard" type="button">
             إصدار بطاقة بديلة/جديدة
           </button>
 
@@ -325,11 +305,7 @@
 
           <h2>التصميمات</h2>
 
-          <button
-            class="btn primary"
-            id="addDesign"
-            type="button"
-          >
+          <button class="btn primary" id="addDesign" type="button">
             إضافة تصميم
           </button>
 
@@ -442,11 +418,7 @@
           ولا يمس حسابات المشرفين والتصميمات والعملاء.
         </p>
 
-        <button
-          class="btn danger"
-          id="resetData"
-          type="button"
-        >
+        <button class="btn danger" id="resetData" type="button">
           حذف بيانات السنة الحالية
         </button>
 
@@ -469,15 +441,9 @@
 
     <div class="toolbar">
 
-      <h2 id="modalTitle">
-        تفاصيل
-      </h2>
+      <h2 id="modalTitle">تفاصيل</h2>
 
-      <button
-        class="btn"
-        id="closeModalBtn"
-        type="button"
-      >
+      <button class="btn" id="closeModalBtn" type="button">
         إغلاق
       </button>
 
@@ -507,86 +473,32 @@
      DOM
   ========================================================= */
 
-  const titleEl =
-    document.getElementById('title');
+  const titleEl = document.getElementById('title');
+  const adminNameEl = document.getElementById('adminName');
+  const logoutBtn = document.getElementById('logout');
+  const sOrdersEl = document.getElementById('sOrders');
+  const sCustomersEl = document.getElementById('sCustomers');
+  const sActiveEl = document.getElementById('sActive');
+  const sVisitsEl = document.getElementById('sVisits');
+  const orderSearchEl = document.getElementById('orderSearch');
+  const customerSearchEl = document.getElementById('customerSearch');
+  const ordersBodyEl = document.getElementById('ordersBody');
+  const customersBodyEl = document.getElementById('customersBody');
+  const cardsBodyEl = document.getElementById('cardsBody');
+  const designsGridEl = document.getElementById('designsGrid');
+  const messagesBodyEl = document.getElementById('messagesBody');
+  const adminsBodyEl = document.getElementById('adminsBody');
+  const newCardBtn = document.getElementById('newCard');
+  const addDesignBtn = document.getElementById('addDesign');
+  const resetDataBtn = document.getElementById('resetData');
+  const modalEl = document.getElementById('modal');
+  const modalTitleEl = document.getElementById('modalTitle');
+  const modalBodyEl = document.getElementById('modalBody');
+  const closeModalBtn = document.getElementById('closeModalBtn');
 
-  const adminNameEl =
-    document.getElementById('adminName');
-
-  const logoutBtn =
-    document.getElementById('logout');
-
-  const sOrdersEl =
-    document.getElementById('sOrders');
-
-  const sCustomersEl =
-    document.getElementById('sCustomers');
-
-  const sActiveEl =
-    document.getElementById('sActive');
-
-  const sVisitsEl =
-    document.getElementById('sVisits');
-
-  const orderSearchEl =
-    document.getElementById('orderSearch');
-
-  const customerSearchEl =
-    document.getElementById('customerSearch');
-
-  const ordersBodyEl =
-    document.getElementById('ordersBody');
-
-  const customersBodyEl =
-    document.getElementById('customersBody');
-
-  const cardsBodyEl =
-    document.getElementById('cardsBody');
-
-  const designsGridEl =
-    document.getElementById('designsGrid');
-
-  const messagesBodyEl =
-    document.getElementById('messagesBody');
-
-  const adminsBodyEl =
-    document.getElementById('adminsBody');
-
-  const newCardBtn =
-    document.getElementById('newCard');
-
-  const addDesignBtn =
-    document.getElementById('addDesign');
-
-  const resetDataBtn =
-    document.getElementById('resetData');
-
-  const modalEl =
-    document.getElementById('modal');
-
-  const modalTitleEl =
-    document.getElementById('modalTitle');
-
-  const modalBodyEl =
-    document.getElementById('modalBody');
-
-  const closeModalBtn =
-    document.getElementById('closeModalBtn');
-
-  const views =
-    Array.from(
-      document.querySelectorAll('.view')
-    );
-
-  const sideLinks =
-    Array.from(
-      document.querySelectorAll('.side-link')
-    );
-
-  const jumpButtons =
-    Array.from(
-      document.querySelectorAll('[data-jump]')
-    );
+  const views = Array.from(document.querySelectorAll('.view'));
+  const sideLinks = Array.from(document.querySelectorAll('.side-link'));
+  const jumpButtons = Array.from(document.querySelectorAll('[data-jump]'));
 
 
   /* =========================================================
@@ -594,17 +506,11 @@
   ========================================================= */
 
   let admin = null;
-
   let orders = [];
-
   let customers = [];
-
   let cards = [];
-
   let designs = [];
-
   let messages = [];
-
   let admins = [];
 
 
@@ -614,100 +520,54 @@
 
   function toast(message, type) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.toast === 'function'
-    ) {
-
-      window.zoma.toast(
-        message,
-        type
-      );
-
+    if (window.zoma && typeof window.zoma.toast === 'function') {
+      window.zoma.toast(message, type);
       return;
     }
 
-    console.log(
-      '[' + (type || 'info') + ']',
-      message
-    );
+    console.log('[' + (type || 'info') + ']', message);
   }
 
 
   function escapeHtml(value) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.escape === 'function'
-    ) {
-
-      return window.zoma.escape(
-        value == null ? '' : String(value)
-      );
-
+    if (window.zoma && typeof window.zoma.escape === 'function') {
+      return window.zoma.escape(value == null ? '' : String(value));
     }
 
-    const div =
-      document.createElement('div');
-
-    div.textContent =
-      value == null ? '' : String(value);
-
+    const div = document.createElement('div');
+    div.textContent = value == null ? '' : String(value);
     return div.innerHTML;
   }
 
 
   function money(value) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.money === 'function'
-    ) {
-
+    if (window.zoma && typeof window.zoma.money === 'function') {
       return window.zoma.money(value);
     }
 
-    const number =
-      Number(value || 0);
-
-    return number.toLocaleString(
-      'ar-EG'
-    ) + ' جنيه';
+    return Number(value || 0).toLocaleString('ar-EG') + ' جنيه';
   }
 
 
   function statusLabel(status) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.statusLabel === 'function'
-    ) {
-
+    if (window.zoma && typeof window.zoma.statusLabel === 'function') {
       return window.zoma.statusLabel(status);
     }
 
     const labels = {
-
       pending: 'قيد المراجعة',
-
       confirmed: 'تم التأكيد',
-
       preparing: 'جاري التجهيز',
-
       ready: 'جاهز',
-
       shipped: 'تم الشحن',
-
       delivered: 'تم التسليم',
-
       rejected: 'مرفوض',
-
       active: 'نشطة',
-
       suspended: 'موقوفة',
-
       unactivated: 'غير مفعلة'
-
     };
 
     return labels[status] || status || '—';
@@ -716,11 +576,7 @@
 
   function statusClass(status) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.statusClass === 'function'
-    ) {
-
+    if (window.zoma && typeof window.zoma.statusClass === 'function') {
       return window.zoma.statusClass(status);
     }
 
@@ -730,11 +586,7 @@
 
   function generateCardId() {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.cardId === 'function'
-    ) {
-
+    if (window.zoma && typeof window.zoma.cardId === 'function') {
       return window.zoma.cardId();
     }
 
@@ -742,67 +594,25 @@
       'ZM-' +
       Date.now().toString(36).toUpperCase() +
       '-' +
-      Math.random()
-        .toString(36)
-        .slice(2, 7)
-        .toUpperCase()
+      Math.random().toString(36).slice(2, 7).toUpperCase()
     );
   }
 
 
   function generatePublicUrl(cardId) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.publicUrl === 'function'
-    ) {
-
+    if (window.zoma && typeof window.zoma.publicUrl === 'function') {
       return window.zoma.publicUrl(cardId);
     }
 
-    return (
-      window.location.origin +
-      '/card.html?id=' +
-      encodeURIComponent(cardId)
-    );
+    return window.location.origin + '/card.html?id=' + encodeURIComponent(cardId);
   }
 
 
-  function generateOrderNumber() {
+  function logAction(action, entity, entityId, metadata) {
 
-    if (
-      window.zoma &&
-      typeof window.zoma.orderNo === 'function'
-    ) {
-
-      return window.zoma.orderNo();
-    }
-
-    return (
-      'ZOMA-' +
-      Date.now()
-    );
-  }
-
-
-  function logAction(
-    action,
-    entity,
-    entityId,
-    metadata
-  ) {
-
-    if (
-      window.zoma &&
-      typeof window.zoma.log === 'function'
-    ) {
-
-      return window.zoma.log(
-        action,
-        entity,
-        entityId,
-        metadata || {}
-      );
+    if (window.zoma && typeof window.zoma.log === 'function') {
+      return window.zoma.log(action, entity, entityId, metadata || {});
     }
 
     return Promise.resolve();
@@ -814,17 +624,12 @@
   ========================================================= */
 
   function closeModal() {
-
     modalEl.classList.remove('show');
   }
 
-  window.closeModal =
-    closeModal;
+  window.closeModal = closeModal;
 
-  closeModalBtn.addEventListener(
-    'click',
-    closeModal
-  );
+  closeModalBtn.addEventListener('click', closeModal);
 
 
   /* =========================================================
@@ -834,94 +639,52 @@
   function show(viewName) {
 
     views.forEach(function (view) {
-
       view.classList.remove('active');
-
     });
 
+    const targetView = document.getElementById(viewName);
 
-    const targetView =
-      document.getElementById(viewName);
-
-
-    if (!targetView) {
-      return;
-    }
-
+    if (!targetView) return;
 
     targetView.classList.add('active');
 
-
     sideLinks.forEach(function (link) {
 
-      link.classList.toggle(
-        'active',
-        link.dataset.view === viewName
-      );
+      link.classList.toggle('active', link.dataset.view === viewName);
 
     });
 
-
     const titles = {
-
       home: 'لوحة التحكم',
-
       orders: 'إدارة الطلبات',
-
       customers: 'العملاء',
-
       cards: 'البطاقات',
-
       designs: 'التصميمات',
-
       messages: 'الرسائل',
-
       admins: 'المشرفون',
-
       settings: 'إدارة البيانات'
-
     };
 
-
-    titleEl.textContent =
-      titles[viewName] ||
-      'لوحة التحكم';
-
+    titleEl.textContent = titles[viewName] || 'لوحة التحكم';
   }
 
-
-  window.show =
-    show;
+  window.show = show;
 
 
   sideLinks.forEach(function (link) {
 
-    link.addEventListener(
-      'click',
-      function () {
-
-        show(
-          link.dataset.view
-        );
-
-      }
-    );
+    link.addEventListener('click', function () {
+      show(link.dataset.view);
+    });
 
   });
 
 
   jumpButtons.forEach(function (button) {
 
-    button.addEventListener(
-      'click',
-      function () {
-
-        show(
-          button.dataset.jump
-        );
-
-      }
-    );
+    button.addEventListener('click', function () {
+      show(button.dataset.jump);
+    });
 
   });
 
@@ -930,32 +693,18 @@
      LOGOUT
   ========================================================= */
 
-  logoutBtn.addEventListener(
-    'click',
-    async function () {
+  logoutBtn.addEventListener('click', async function () {
 
-      try {
+    try {
 
-        if (
-          window.zoma &&
-          typeof window.zoma.signOut === 'function'
-        ) {
-
-          await window.zoma.signOut();
-
-        }
-
-      } catch (error) {
-
-        console.error(
-          'Logout Error:',
-          error
-        );
-
+      if (window.zoma && typeof window.zoma.signOut === 'function') {
+        await window.zoma.signOut();
       }
 
+    } catch (error) {
+      console.error('Logout Error:', error);
     }
-  );
+  });
 
 
   /* =========================================================
@@ -966,274 +715,115 @@
 
     try {
 
-      if (
-        !window.zoma ||
-        typeof window.zoma.requireAdmin !== 'function'
-      ) {
-
-        console.error(
-          'app.js غير محمل بشكل صحيح.'
-        );
-
+      if (!window.zoma || typeof window.zoma.requireAdmin !== 'function') {
+        console.error('app.js غير محمل بشكل صحيح.');
         return;
       }
 
+      admin = await window.zoma.requireAdmin();
 
-      admin =
-        await window.zoma.requireAdmin();
-
-
-      if (!admin) {
-        return;
-      }
-
+      if (!admin) return;
 
       adminNameEl.textContent =
-        (
-          admin.full_name ||
-          ''
-        ) +
-        (
-          admin.role
-            ? ' — ' + admin.role
-            : ''
-        );
+        (admin.full_name || '') + (admin.role ? ' — ' + admin.role : '');
 
 
-      const results =
-        await Promise.all([
+      const results = await Promise.all([
 
-          sb
-            .from('orders')
-            .select('id,order_number,customer_id,design_id,total_price,status,customer_name,phone,shipping_governorate,shipping_city,shipping_address,customer_notes,admin_notes,created_at,updated_at')
-            .order('created_at', { ascending: false }),
+        sb.from('orders')
+          .select('id,order_number,customer_id,design_id,total_price,status,customer_name,phone,shipping_governorate,shipping_city,shipping_address,customer_notes,admin_notes,created_at,updated_at')
+          .order('created_at', { ascending: false }),
 
-          sb
-            .from('customers')
-            .select('*')
-            .order(
-              'created_at',
-              {
-                ascending: false
-              }
-            ),
+        sb.from('customers')
+          .select('*')
+          .order('created_at', { ascending: false }),
 
-          sb
-            .from('cards')
-            .select(
-              '*,customers(full_name,phone),orders(order_number),profiles(*)'
-            )
-            .order(
-              'created_at',
-              {
-                ascending: false
-              }
-            ),
+        sb.from('cards')
+          .select('id,card_id,customer_id,order_id,public_url,status,created_at,updated_at')
+          .order('created_at', { ascending: false }),
 
-          sb
-            .from('designs')
-            .select('*')
-            .order(
-              'created_at',
-              {
-                ascending: false
-              }
-            ),
+        sb.from('designs')
+          .select('*')
+          .order('created_at', { ascending: false }),
 
-          sb
-            .from('messages')
-            .select('*')
-            .order(
-              'created_at',
-              {
-                ascending: false
-              }
-            ),
+        sb.from('messages')
+          .select('*')
+          .order('created_at', { ascending: false }),
 
-          sb
-            .from('admins')
-            .select('*')
-            .order(
-              'created_at'
-            ),
+        sb.from('admins')
+          .select('*')
+          .order('created_at'),
 
-          sb
-            .from('analytics')
-            .select(
-              'id',
-              {
-                count: 'exact',
-                head: true
-              }
-            )
+        sb.from('analytics')
+          .select('id', { count: 'exact', head: true })
 
-        ]);
+      ]);
 
 
       let ordersResult = results[0];
 
-      // If PostgREST rejects one of the legacy order columns, retry with only
-      // the guaranteed core columns so the Orders section never disappears.
+      /* لو فشل الاستعلام بسبب عمود مفقود، جرّب الأعمدة الأساسية فقط */
       if (ordersResult.error) {
+
+        console.warn('Orders primary query failed, retrying with core columns:', ordersResult.error);
+
         const retry = await sb.from('orders')
           .select('id,order_number,customer_id,design_id,total_price,status,created_at,updated_at')
           .order('created_at', { ascending: false });
+
         if (!retry.error) ordersResult = retry;
       }
 
-      const customersResult =
-        results[1];
 
-      const cardsResult =
-        results[2];
-
-      const designsResult =
-        results[3];
-
-      const messagesResult =
-        results[4];
-
-      const adminsResult =
-        results[5];
-
-      const analyticsResult =
-        results[6];
+      const customersResult = results[1];
+      const cardsResult = results[2];
+      const designsResult = results[3];
+      const messagesResult = results[4];
+      const adminsResult = results[5];
+      const analyticsResult = results[6];
 
 
-      if (ordersResult.error) {
-
-        console.error(
-          'Orders:',
-          ordersResult.error
-        );
-
-      }
-
-
-      if (customersResult.error) {
-
-        console.error(
-          'Customers:',
-          customersResult.error
-        );
-
-      }
+      if (ordersResult.error) console.error('Orders:', ordersResult.error);
+      if (customersResult.error) console.error('Customers:', customersResult.error);
+      if (cardsResult.error) console.error('Cards:', cardsResult.error);
+      if (designsResult.error) console.error('Designs:', designsResult.error);
+      if (messagesResult.error) console.error('Messages:', messagesResult.error);
+      if (adminsResult.error) console.error('Admins:', adminsResult.error);
+      if (analyticsResult.error) console.error('Analytics:', analyticsResult.error);
 
 
-      if (cardsResult.error) {
-
-        console.error(
-          'Cards:',
-          cardsResult.error
-        );
-
-      }
+      orders = ordersResult.data || [];
+      customers = customersResult.data || [];
+      cards = cardsResult.data || [];
+      designs = designsResult.data || [];
+      messages = messagesResult.data || [];
+      admins = adminsResult.data || [];
 
 
-      if (designsResult.error) {
-
-        console.error(
-          'Designs:',
-          designsResult.error
-        );
-
-      }
-
-
-      if (messagesResult.error) {
-
-        console.error(
-          'Messages:',
-          messagesResult.error
-        );
-
-      }
-
-
-      if (adminsResult.error) {
-
-        console.error(
-          'Admins:',
-          adminsResult.error
-        );
-
-      }
-
-
-      if (analyticsResult.error) {
-
-        console.error(
-          'Analytics:',
-          analyticsResult.error
-        );
-
-      }
-
-
-      orders =
-        ordersResult.data || [];
-
-      customers =
-        customersResult.data || [];
-
-      cards =
-        cardsResult.data || [];
-
-      designs =
-        designsResult.data || [];
-
-      messages =
-        messagesResult.data || [];
-
-      admins =
-        adminsResult.data || [];
-
-
-      sOrdersEl.textContent =
-        orders.length;
-
-      sCustomersEl.textContent =
-        customers.length;
+      sOrdersEl.textContent = orders.length;
+      sCustomersEl.textContent = customers.length;
 
       sActiveEl.textContent =
-        cards.filter(
-          function (card) {
+        cards.filter(function (card) {
+          return card.status === 'active';
+        }).length;
 
-            return (
-              card.status === 'active'
-            );
-
-          }
-        ).length;
-
-      sVisitsEl.textContent =
-        analyticsResult.count || 0;
+      sVisitsEl.textContent = analyticsResult.count || 0;
 
 
       renderOrders();
-
       renderCustomers();
-
       renderCards();
-
       renderDesigns();
-
       renderMessages();
-
       renderAdmins();
 
 
     } catch (error) {
 
-      console.error(
-        'Dashboard Load Error:',
-        error
-      );
+      console.error('Dashboard Load Error:', error);
 
-      toast(
-        'حدث خطأ أثناء تحميل لوحة التحكم',
-        'error'
-      );
+      toast('حدث خطأ أثناء تحميل لوحة التحكم', 'error');
 
     }
 
@@ -1246,20 +836,11 @@
 
   function getOrderCard(order) {
 
-    if (!order) {
-      return null;
-    }
+    if (!order) return null;
 
-
-    if (
-      Array.isArray(order.cards)
-    ) {
-
-      return order.cards[0] || null;
-    }
-
-
-    return null;
+    return cards.find(function (card) {
+      return card.order_id === order.id;
+    }) || null;
   }
 
 
@@ -1269,265 +850,159 @@
 
   function renderOrders() {
 
-    const query =
-      (
-        orderSearchEl.value ||
-        ''
-      )
-        .toLowerCase()
-        .trim();
+    const query = (orderSearchEl.value || '').toLowerCase().trim();
 
 
-    const filtered =
-      orders.filter(
-        function (order) {
+    const filtered = orders.filter(function (order) {
 
-          const customerName =
-            order.customers?.full_name ||
-            order.customer_name ||
-            '';
+      const customerName =
+        order.customer_name ||
+        (order.customers && order.customers.full_name) ||
+        '';
 
-          const phone =
-            order.phone ||
-            order.customers?.phone ||
-            '';
+      const phone =
+        order.phone ||
+        (order.customers && order.customers.phone) ||
+        '';
 
-          const orderNumber =
-            order.order_number ||
-            '';
+      const orderNumber = order.order_number || '';
 
-
-          return (
-            String(orderNumber)
-              .toLowerCase()
-              .includes(query) ||
-
-            String(customerName)
-              .toLowerCase()
-              .includes(query) ||
-
-            String(phone)
-              .toLowerCase()
-              .includes(query)
-          );
-
-        }
+      return (
+        String(orderNumber).toLowerCase().includes(query) ||
+        String(customerName).toLowerCase().includes(query) ||
+        String(phone).toLowerCase().includes(query)
       );
 
-
-    ordersBodyEl.innerHTML =
-      filtered.map(
-        function (order) {
-
-          const card =
-            getOrderCard(order);
+    });
 
 
-          const customerName =
-            order.customers?.full_name ||
-            order.customer_name ||
-            '—';
+    ordersBodyEl.innerHTML = filtered.map(function (order) {
+
+      const card = getOrderCard(order);
 
 
-          const phone =
-            order.phone ||
-            order.customers?.phone ||
-            '';
+      const customerName =
+        order.customer_name ||
+        (order.customers && order.customers.full_name) ||
+        '—';
+
+      const phone =
+        order.phone ||
+        (order.customers && order.customers.phone) ||
+        '';
 
 
-          const designName =
-            order.designs?.name ||
-            '—';
+      /* التصميم يُجلب من مصفوفة designs بواسطة design_id */
+      const designObj =
+        order.design_id
+          ? designs.find(function (d) { return d.id === order.design_id; })
+          : null;
+
+      const designName = designObj ? designObj.name : '—';
 
 
-          const statuses = [
-
-            'pending',
-
-            'confirmed',
-
-            'preparing',
-
-            'ready',
-
-            'shipped',
-
-            'delivered',
-
-            'rejected'
-
-          ];
+      const statuses = [
+        'pending',
+        'confirmed',
+        'preparing',
+        'ready',
+        'shipped',
+        'delivered',
+        'rejected'
+      ];
 
 
-          const statusOptions =
-            statuses.map(
-              function (status) {
+      const statusOptions = statuses.map(function (status) {
 
-                return `
-                  <option
-                    value="${escapeHtml(status)}"
-                    ${
-                      order.status === status
-                        ? 'selected'
-                        : ''
-                    }
-                  >
-                    ${escapeHtml(
-                      statusLabel(status)
-                    )}
-                  </option>
-                `;
+        return `
+          <option value="${escapeHtml(status)}" ${order.status === status ? 'selected' : ''}>
+            ${escapeHtml(statusLabel(status))}
+          </option>
+        `;
 
-              }
-            ).join('');
+      }).join('');
 
 
-          return `
-
-            <tr>
-
-              <td>
-                ${escapeHtml(
-                  order.order_number ||
-                  '—'
-                )}
-              </td>
-
-
-              <td>
-
-                ${escapeHtml(
-                  customerName
-                )}
-
-                <br>
-
-                <span class="muted">
-                  ${escapeHtml(phone)}
-                </span>
-
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  designName
-                )}
-              </td>
-
-
-              <td>
-                ${money(
-                  order.total_price
-                )}
-              </td>
-
-
-              <td>
-
-                <select
-                  data-order-status-id="${escapeHtml(
-                    order.id
-                  )}"
-                  class="order-status-select"
-                >
-
-                  ${statusOptions}
-
-                </select>
-
-              </td>
-
-
-              <td>
-
-                ${
-                  card
-
-                    ? `
-                      <span class="chip">
-                        ${escapeHtml(
-                          card.card_id
-                        )}
-                      </span>
-                    `
-
-                    : `
-                      <span class="muted">
-                        لم تُنشأ بعد
-                      </span>
-                    `
-                }
-
-              </td>
-
-
-              <td>
-
-                <div class="actions">
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-order-details="${escapeHtml(
-                      order.id
-                    )}"
-                  >
-                    تفاصيل
-                  </button>
-
-
-                  ${
-                    card
-
-                      ? `
-                        <button
-                          class="btn primary"
-                          type="button"
-                          data-card-preview="${escapeHtml(
-                            card.id
-                          )}"
-                        >
-                          البطاقة
-                        </button>
-                      `
-
-                      : `
-                        <button
-                          class="btn success"
-                          type="button"
-                          data-issue-card="${escapeHtml(
-                            order.id
-                          )}"
-                        >
-                          إنشاء بطاقة
-                        </button>
-                      `
-                  }
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      ).join('') || `
+      return `
 
         <tr>
 
-          <td
-            colspan="7"
-            class="empty"
-          >
-            لا توجد طلبات.
+          <td>${escapeHtml(order.order_number || '—')}</td>
+
+          <td>
+            ${escapeHtml(customerName)}
+            <br>
+            <span class="muted">${escapeHtml(phone)}</span>
+          </td>
+
+          <td>${escapeHtml(designName)}</td>
+
+          <td>${money(order.total_price)}</td>
+
+          <td>
+            <select
+              data-order-status-id="${escapeHtml(order.id)}"
+              class="order-status-select"
+            >
+              ${statusOptions}
+            </select>
+          </td>
+
+          <td>
+            ${
+              card
+                ? `<span class="chip">${escapeHtml(card.card_id)}</span>`
+                : `<span class="muted">لم تُنشأ بعد</span>`
+            }
+          </td>
+
+          <td>
+            <div class="actions">
+
+              <button
+                class="btn"
+                type="button"
+                data-order-details="${escapeHtml(order.id)}"
+              >
+                تفاصيل
+              </button>
+
+              ${
+                card
+                  ? `
+                    <button
+                      class="btn primary"
+                      type="button"
+                      data-card-preview="${escapeHtml(card.id)}"
+                    >
+                      البطاقة
+                    </button>
+                  `
+                  : `
+                    <button
+                      class="btn success"
+                      type="button"
+                      data-issue-card="${escapeHtml(order.id)}"
+                    >
+                      إنشاء بطاقة
+                    </button>
+                  `
+              }
+
+            </div>
           </td>
 
         </tr>
 
       `;
+
+    }).join('') || `
+
+      <tr>
+        <td colspan="7" class="empty">لا توجد طلبات.</td>
+      </tr>
+
+    `;
 
 
     bindOrderButtons();
@@ -1541,93 +1016,40 @@
 
   function bindOrderButtons() {
 
-    document
-      .querySelectorAll(
-        '[data-order-status-id]'
-      )
-      .forEach(
-        function (element) {
+    document.querySelectorAll('[data-order-status-id]').forEach(function (element) {
 
-          element.addEventListener(
-            'change',
-            function () {
+      element.addEventListener('change', function () {
+        setOrderStatus(element.dataset.orderStatusId, element.value);
+      });
 
-              setOrderStatus(
-                element.dataset.orderStatusId,
-                element.value
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-order-details]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-order-details]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        orderDetails(button.dataset.orderDetails);
+      });
 
-              orderDetails(
-                button.dataset.orderDetails
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-issue-card]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-issue-card]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        issueCard(button.dataset.issueCard);
+      });
 
-              issueCard(
-                button.dataset.issueCard
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-card-preview]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-card-preview]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        showCard(button.dataset.cardPreview);
+      });
 
-              showCard(
-                button.dataset.cardPreview
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
   }
 
@@ -1636,28 +1058,14 @@
      SET ORDER STATUS
   ========================================================= */
 
-  async function setOrderStatus(
-    id,
-    status
-  ) {
+  async function setOrderStatus(id, status) {
 
     try {
 
-      const order =
-        orders.find(
-          function (item) {
-            return item.id === id;
-          }
-        );
-
+      const order = orders.find(function (item) { return item.id === id; });
 
       if (!order) {
-
-        toast(
-          'الطلب غير موجود',
-          'error'
-        );
-
+        toast('الطلب غير موجود', 'error');
         return;
       }
 
@@ -1665,55 +1073,41 @@
       let result;
 
       if (status === 'confirmed') {
+
         const rpc = await sb.rpc('zoma_confirm_order', {
           p_order_id: id,
-          p_site_url: window.ZOMA_CONFIG?.SITE_URL || location.origin + '/'
+          p_site_url: (window.ZOMA_CONFIG && window.ZOMA_CONFIG.SITE_URL) || location.origin + '/'
         });
+
         result = { data: rpc.data, error: rpc.error };
+
       } else {
+
         result = await sb
           .from('orders')
-          .update({ status })
+          .update({ status: status })
           .eq('id', id);
+
       }
 
 
       if (result.error) {
 
-        console.error(
-          result.error
-        );
-
-        toast(
-          result.error.message,
-          'error'
-        );
+        console.error(result.error);
+        toast(result.error.message, 'error');
 
         await load();
-
         return;
       }
 
 
-
-
       try {
 
-        await logAction(
-          'update_order_status',
-          'order',
-          id,
-          {
-            status: status
-          }
-        );
+        await logAction('update_order_status', 'order', id, { status: status });
 
       } catch (logError) {
 
-        console.warn(
-          'Log error:',
-          logError
-        );
+        console.warn('Log error:', logError);
 
       }
 
@@ -1731,16 +1125,9 @@
 
     } catch (error) {
 
-      console.error(
-        'Set Order Status Error:',
-        error
-      );
+      console.error('Set Order Status Error:', error);
 
-      toast(
-        error.message ||
-        'حدث خطأ أثناء تحديث الحالة',
-        'error'
-      );
+      toast(error.message || 'حدث خطأ أثناء تحديث الحالة', 'error');
 
       await load();
 
@@ -1748,9 +1135,7 @@
 
   }
 
-
-  window.setOrderStatus =
-    setOrderStatus;
+  window.setOrderStatus = setOrderStatus;
 
 
   /* =========================================================
@@ -1759,55 +1144,36 @@
 
   function orderDetails(id) {
 
-    const order =
-      orders.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const order = orders.find(function (item) { return item.id === id; });
+
+    if (!order) return;
 
 
-    if (!order) {
-      return;
-    }
-
-
-    modalTitleEl.textContent =
-      'تفاصيل ' +
-      (
-        order.order_number ||
-        ''
-      );
+    modalTitleEl.textContent = 'تفاصيل ' + (order.order_number || '');
 
 
     const design =
-      order.designs || {};
+      order.design_id
+        ? designs.find(function (d) { return d.id === order.design_id; })
+        : null;
 
 
-    const designImage =
-      design.preview_url ||
-      '';
+    const designImage = design ? (design.preview_url || '') : '';
 
 
     modalBodyEl.innerHTML = `
 
       <div class="form">
 
-
         ${
           designImage
-
             ? `
               <div class="notice-box">
 
-                <div class="muted">
-                  معاينة التصميم
-                </div>
+                <div class="muted">معاينة التصميم</div>
 
                 <img
-                  src="${escapeHtml(
-                    designImage
-                  )}"
+                  src="${escapeHtml(designImage)}"
                   alt="تصميم البطاقة"
                   style="
                     width:100%;
@@ -1820,109 +1186,45 @@
 
               </div>
             `
-
             : ''
         }
 
 
         <div class="notice-box">
 
-          <b>الطلب:</b>
-          ${escapeHtml(
-            order.order_number ||
-            ''
-          )}
+          <b>الطلب:</b> ${escapeHtml(order.order_number || '')}<br>
 
-          <br>
+          <b>العميل:</b> ${escapeHtml(order.customer_name || '')}<br>
 
-          <b>العميل:</b>
-          ${escapeHtml(
-            order.customer_name ||
-            order.customers?.full_name ||
-            ''
-          )}
+          <b>الهاتف:</b> ${escapeHtml(order.phone || '')}<br>
 
-          <br>
+          <b>التصميم:</b> ${escapeHtml(design ? design.name : '')}<br>
 
-          <b>الهاتف:</b>
-          ${escapeHtml(
-            order.phone ||
-            order.customers?.phone ||
-            ''
-          )}
+          <b>السعر:</b> ${money(order.total_price)}<br>
 
-          <br>
+          <b>المحافظة:</b> ${escapeHtml(order.shipping_governorate || '')}<br>
 
-          <b>التصميم:</b>
-          ${escapeHtml(
-            design.name ||
-            ''
-          )}
+          <b>المدينة:</b> ${escapeHtml(order.shipping_city || '')}<br>
 
-          <br>
-
-          <b>السعر:</b>
-          ${money(
-            order.total_price
-          )}
-
-          <br>
-
-          <b>المحافظة:</b>
-          ${escapeHtml(
-            order.shipping_governorate ||
-            ''
-          )}
-
-          <br>
-
-          <b>المدينة:</b>
-          ${escapeHtml(
-            order.shipping_city ||
-            ''
-          )}
-
-          <br>
-
-          <b>العنوان:</b>
-          ${escapeHtml(
-            order.shipping_address ||
-            ''
-          )}
+          <b>العنوان:</b> ${escapeHtml(order.shipping_address || '')}
 
         </div>
 
 
         <div class="field">
 
-          <label>
-            ملاحظات العميل
-          </label>
+          <label>ملاحظات العميل</label>
 
-          <textarea
-            rows="4"
-            readonly
-          >${escapeHtml(
-            order.customer_notes ||
-            ''
-          )}</textarea>
+          <textarea rows="4" readonly>${escapeHtml(order.customer_notes || '')}</textarea>
 
         </div>
 
 
         <div class="field">
 
-          <label>
-            ملاحظات الإدارة / سبب الرفض
-          </label>
+          <label>ملاحظات الإدارة / سبب الرفض</label>
 
-          <textarea
-            id="adminNotes"
-            rows="4"
-          >${escapeHtml(
-            order.admin_notes ||
-            ''
-          )}</textarea>
+          <textarea id="adminNotes" rows="4">${escapeHtml(order.admin_notes || '')}</textarea>
 
         </div>
 
@@ -1943,26 +1245,15 @@
     modalEl.classList.add('show');
 
 
-    const saveNotesBtn =
-      document.getElementById(
-        'saveOrderNotesBtn'
-      );
+    const saveNotesBtn = document.getElementById('saveOrderNotesBtn');
 
-
-    saveNotesBtn.addEventListener(
-      'click',
-      function () {
-
-        saveNotes(id);
-
-      }
-    );
+    saveNotesBtn.addEventListener('click', function () {
+      saveNotes(id);
+    });
 
   }
 
-
-  window.orderDetails =
-    orderDetails;
+  window.orderDetails = orderDetails;
 
 
   /* =========================================================
@@ -1971,46 +1262,24 @@
 
   async function saveNotes(id) {
 
-    const notesEl =
-      document.getElementById(
-        'adminNotes'
-      );
+    const notesEl = document.getElementById('adminNotes');
+
+    if (!notesEl) return;
 
 
-    if (!notesEl) {
-      return;
-    }
-
-
-    const result =
-      await sb
-        .from('orders')
-        .update({
-          admin_notes:
-            notesEl.value
-        })
-        .eq(
-          'id',
-          id
-        );
+    const result = await sb
+      .from('orders')
+      .update({ admin_notes: notesEl.value })
+      .eq('id', id);
 
 
     if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
+      toast(result.error.message, 'error');
       return;
     }
 
 
-    toast(
-      'تم حفظ الملاحظات',
-      'success'
-    );
-
+    toast('تم حفظ الملاحظات', 'success');
 
     closeModal();
 
@@ -2018,210 +1287,113 @@
 
   }
 
-
-  window.saveNotes =
-    saveNotes;
+  window.saveNotes = saveNotes;
 
 
   /* =========================================================
      CREATE CARD FOR ORDER
   ========================================================= */
 
-  async function createCardForOrder(
-    order
-  ) {
+  async function createCardForOrder(order) {
 
     try {
 
       if (!order) {
-
-        return {
-          success: false,
-          error: 'الطلب غير موجود'
-        };
-
+        return { success: false, error: 'الطلب غير موجود' };
       }
 
 
-      /* =========================
-         Check existing card
-      ========================= */
+      /* هل توجد بطاقة بالفعل؟ */
 
-      const existingResult =
-        await sb
-          .from('cards')
-          .select(
-            'id,card_id,status,public_url'
-          )
-          .eq(
-            'order_id',
-            order.id
-          )
-          .maybeSingle();
+      const existingResult = await sb
+        .from('cards')
+        .select('id,card_id,status,public_url')
+        .eq('order_id', order.id)
+        .maybeSingle();
 
 
       if (existingResult.error) {
-
-        return {
-          success: false,
-          error:
-            existingResult.error.message
-        };
-
+        return { success: false, error: existingResult.error.message };
       }
 
 
-      if (
-        existingResult.data
-      ) {
-
-        return {
-          success: true,
-          card:
-            existingResult.data
-        };
-
+      if (existingResult.data) {
+        return { success: true, card: existingResult.data };
       }
 
 
-      /* =========================
-         Card ID + public URL
-      ========================= */
+      /* بيانات البطاقة */
 
-      const cardId =
-        generateCardId();
+      const cardId = generateCardId();
+      const publicUrl = generatePublicUrl(cardId);
 
 
-      const publicUrl =
-        generatePublicUrl(
-          cardId
-        );
+      /* إنشاء البطاقة */
 
-
-      /* =========================
-         Create Card
-      ========================= */
-
-      const cardResult =
-        await sb
-          .from('cards')
-          .insert({
-
-            customer_id:
-              order.customer_id,
-
-            order_id:
-              order.id,
-
-            card_id:
-              cardId,
-
-            public_url:
-              publicUrl,
-
-            status:
-              'unactivated'
-
-          })
-          .select()
-          .single();
+      const cardResult = await sb
+        .from('cards')
+        .insert({
+          customer_id: order.customer_id,
+          order_id: order.id,
+          card_id: cardId,
+          public_url: publicUrl,
+          status: 'unactivated'
+        })
+        .select()
+        .single();
 
 
       if (cardResult.error) {
-
-        return {
-          success: false,
-          error:
-            cardResult.error.message
-        };
-
+        return { success: false, error: cardResult.error.message };
       }
 
 
-      /* =========================
-         Create / Update Profile
-      ========================= */
+      /* إنشاء/تحديث Profile */
 
-      const customerName =
-        order.customer_name ||
-        order.customers?.full_name ||
-        '';
+      const customerName = order.customer_name || '';
 
 
-      const profileResult =
-        await sb
-          .from('profiles')
-          .upsert(
-            {
-              card_id:
-                cardResult.data.id,
-
-              full_name:
-                customerName
-
-            },
-            {
-              onConflict:
-                'card_id'
-            }
-          );
-
-
-      if (
-        profileResult.error
-      ) {
-
-        console.warn(
-          'Profile Upsert Error:',
-          profileResult.error
+      const profileResult = await sb
+        .from('profiles')
+        .upsert(
+          {
+            card_id: cardResult.data.id,
+            full_name: customerName
+          },
+          { onConflict: 'card_id' }
         );
 
+
+      if (profileResult.error) {
+        /* لا نوقف العملية، لكن نسجّل الخطأ */
+        console.warn('Profile Upsert Error:', profileResult.error);
       }
 
 
-      /* =========================
-         Log
-      ========================= */
+      /* سجل النشاط */
 
       try {
 
-        await logAction(
-          'issue_card',
-          'card',
-          cardResult.data.id,
-          {
-            card_id:
-              cardId,
-
-            order_id:
-              order.id
-          }
-        );
+        await logAction('issue_card', 'card', cardResult.data.id, {
+          card_id: cardId,
+          order_id: order.id
+        });
 
       } catch (logError) {
 
-        console.warn(
-          'Card log error:',
-          logError
-        );
+        console.warn('Card log error:', logError);
 
       }
 
 
-      return {
-        success: true,
-        card:
-          cardResult.data
-      };
+      return { success: true, card: cardResult.data };
 
 
     } catch (error) {
 
       return {
         success: false,
-        error:
-          error.message ||
-          'حدث خطأ أثناء إنشاء البطاقة'
+        error: error.message || 'حدث خطأ أثناء إنشاء البطاقة'
       };
 
     }
@@ -2233,77 +1405,43 @@
      ISSUE CARD MANUALLY
   ========================================================= */
 
-  async function issueCard(
-    orderId
-  ) {
+  async function issueCard(orderId) {
 
-    const order =
-      orders.find(
-        function (item) {
-          return item.id === orderId;
-        }
-      );
-
+    const order = orders.find(function (item) { return item.id === orderId; });
 
     if (!order) {
-
-      toast(
-        'الطلب غير موجود',
-        'error'
-      );
-
+      toast('الطلب غير موجود', 'error');
       return;
     }
 
 
     try {
 
-      const result =
-        await createCardForOrder(
-          order
-        );
+      const result = await createCardForOrder(order);
 
 
       if (!result.success) {
-
-        toast(
-          result.error,
-          'error'
-        );
-
+        toast(result.error, 'error');
         return;
       }
 
 
-      toast(
-        'تم إصدار البطاقة: ' +
-        result.card.card_id,
-        'success'
-      );
-
+      toast('تم إصدار البطاقة: ' + result.card.card_id, 'success');
 
       await load();
 
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-      toast(
-        error.message ||
-        'حدث خطأ أثناء إصدار البطاقة',
-        'error'
-      );
+      toast(error.message || 'حدث خطأ أثناء إصدار البطاقة', 'error');
 
     }
 
   }
 
-
-  window.issueCard =
-    issueCard;
+  window.issueCard = issueCard;
 
 
   /* =========================================================
@@ -2312,30 +1450,18 @@
 
   function showCard(id) {
 
-    const card =
-      cards.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const card = cards.find(function (item) { return item.id === id; });
+
+    if (!card) return;
 
 
-    if (!card) {
-      return;
-    }
+    modalTitleEl.textContent = 'البطاقة ' + (card.card_id || '');
 
 
-    modalTitleEl.textContent =
-      'البطاقة ' +
-      (
-        card.card_id ||
-        ''
-      );
+    const customer =
+      customers.find(function (c) { return c.id === card.customer_id; });
 
-
-    const customerName =
-      card.customers?.full_name ||
-      '—';
+    const customerName = customer ? customer.full_name : '—';
 
 
     modalBodyEl.innerHTML = `
@@ -2344,26 +1470,11 @@
 
         <div class="notice-box">
 
-          <b>Card ID:</b>
-          ${escapeHtml(
-            card.card_id || ''
-          )}
+          <b>Card ID:</b> ${escapeHtml(card.card_id || '')}<br>
 
-          <br>
+          <b>العميل:</b> ${escapeHtml(customerName)}<br>
 
-          <b>العميل:</b>
-          ${escapeHtml(
-            customerName
-          )}
-
-          <br>
-
-          <b>الحالة:</b>
-          ${escapeHtml(
-            statusLabel(
-              card.status
-            )
-          )}
+          <b>الحالة:</b> ${escapeHtml(statusLabel(card.status))}
 
         </div>
 
@@ -2372,38 +1483,20 @@
 
           <b>الرابط العام:</b>
 
-          <div
-            style="
-              word-break:break-all;
-              margin-top:8px
-            "
-          >
-            ${escapeHtml(
-              card.public_url ||
-              ''
-            )}
+          <div style="word-break:break-all;margin-top:8px">
+            ${escapeHtml(card.public_url || '')}
           </div>
 
         </div>
 
 
-        <div
-          style="
-            display:flex;
-            justify-content:center;
-            margin:16px 0
-          "
-        >
+        <div style="display:flex;justify-content:center;margin:16px 0">
 
           <canvas
             id="modalQrCanvas"
             width="280"
             height="280"
-            style="
-              max-width:100%;
-              background:#fff;
-              border-radius:12px;
-            "
+            style="max-width:100%;background:#fff;border-radius:12px;"
           ></canvas>
 
         </div>
@@ -2411,32 +1504,19 @@
 
         <div class="actions">
 
-          <button
-            class="btn"
-            type="button"
-            id="modalCopyUrl"
-          >
+          <button class="btn" type="button" id="modalCopyUrl">
             نسخ الرابط
           </button>
 
-
-          <button
-            class="btn"
-            type="button"
-            id="modalDownloadQr"
-          >
+          <button class="btn" type="button" id="modalDownloadQr">
             تنزيل QR
           </button>
-
 
           <a
             class="btn primary"
             target="_blank"
             rel="noopener noreferrer"
-            href="${escapeHtml(
-              card.public_url ||
-              '#'
-            )}"
+            href="${escapeHtml(card.public_url || '#')}"
           >
             فتح البطاقة
           </a>
@@ -2450,104 +1530,49 @@
 
     modalEl.classList.add('show');
 
-
-    drawQr(
-      card.public_url,
-      'modalQrCanvas'
-    );
+    drawQr(card.public_url, 'modalQrCanvas');
 
 
-    const copyBtn =
-      document.getElementById(
-        'modalCopyUrl'
-      );
+    const copyBtn = document.getElementById('modalCopyUrl');
+
+    copyBtn.addEventListener('click', function () {
+      copyText(card.public_url);
+    });
 
 
-    copyBtn.addEventListener(
-      'click',
-      function () {
+    const downloadBtn = document.getElementById('modalDownloadQr');
 
-        copyText(
-          card.public_url
-        );
-
-      }
-    );
-
-
-    const downloadBtn =
-      document.getElementById(
-        'modalDownloadQr'
-      );
-
-
-    downloadBtn.addEventListener(
-      'click',
-      function () {
-
-        downloadQr(
-          card.card_id,
-          card.public_url
-        );
-
-      }
-    );
+    downloadBtn.addEventListener('click', function () {
+      downloadQr(card.card_id, card.public_url);
+    });
 
   }
 
-
-  window.showCard =
-    showCard;
+  window.showCard = showCard;
 
 
   /* =========================================================
      DRAW QR
   ========================================================= */
 
-  function drawQr(
-    url,
-    canvasId
-  ) {
+  function drawQr(url, canvasId) {
 
-    const canvas =
-      document.getElementById(
-        canvasId
-      );
+    const canvas = document.getElementById(canvasId);
+
+    if (!canvas) return;
 
 
-    if (!canvas) {
-      return;
-    }
+    if (typeof QRCode === 'undefined') {
 
+      const ctx = canvas.getContext('2d');
 
-    if (
-      typeof QRCode ===
-      'undefined'
-    ) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      const ctx =
-        canvas.getContext(
-          '2d'
-        );
+      ctx.font = '16px Arial';
 
-      ctx.clearRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
+      ctx.textAlign = 'center';
 
-      ctx.font =
-        '16px Arial';
-
-      ctx.textAlign =
-        'center';
-
-      ctx.fillText(
-        'تعذر تحميل مولد QR',
-        canvas.width / 2,
-        canvas.height / 2
-      );
+      ctx.fillText('تعذر تحميل مولد QR', canvas.width / 2, canvas.height / 2);
 
       return;
     }
@@ -2562,16 +1587,7 @@
         errorCorrectionLevel: 'H'
       },
       function (error) {
-
-        if (error) {
-
-          console.error(
-            'QR Error:',
-            error
-          );
-
-        }
-
+        if (error) console.error('QR Error:', error);
       }
     );
 
@@ -2582,21 +1598,10 @@
      DOWNLOAD QR
   ========================================================= */
 
-  function downloadQr(
-    cardId,
-    url
-  ) {
+  function downloadQr(cardId, url) {
 
-    if (
-      typeof QRCode ===
-      'undefined'
-    ) {
-
-      toast(
-        'مولد QR غير جاهز',
-        'error'
-      );
-
+    if (typeof QRCode === 'undefined') {
+      toast('مولد QR غير جاهز', 'error');
       return;
     }
 
@@ -2608,130 +1613,76 @@
         margin: 3,
         errorCorrectionLevel: 'H'
       },
-      function (
-        error,
-        dataUrl
-      ) {
+      function (error, dataUrl) {
 
         if (error) {
 
-          console.error(
-            error
-          );
+          console.error(error);
 
-          toast(
-            'تعذر إنشاء QR',
-            'error'
-          );
+          toast('تعذر إنشاء QR', 'error');
 
           return;
         }
 
 
-        const link =
-          document.createElement(
-            'a'
-          );
+        const link = document.createElement('a');
 
+        link.href = dataUrl;
 
-        link.href =
-          dataUrl;
+        link.download = (cardId || 'ZOMA-QR') + '-QR.png';
 
-
-        link.download =
-          (
-            cardId ||
-            'ZOMA-QR'
-          ) +
-          '-QR.png';
-
-
-        document.body.appendChild(
-          link
-        );
-
+        document.body.appendChild(link);
 
         link.click();
-
 
         link.remove();
 
 
-        toast(
-          'تم تنزيل QR بجودة عالية',
-          'success'
-        );
+        toast('تم تنزيل QR بجودة عالية', 'success');
 
       }
     );
 
   }
 
-
-  window.downloadQr =
-    downloadQr;
+  window.downloadQr = downloadQr;
 
 
   /* =========================================================
      COPY TEXT
   ========================================================= */
 
-  async function copyText(
-    text
-  ) {
+  async function copyText(text) {
 
     try {
 
-      if (
-        navigator.clipboard &&
-        navigator.clipboard.writeText
-      ) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
 
-        await navigator.clipboard.writeText(
-          text
-        );
+        await navigator.clipboard.writeText(text);
 
       } else {
 
-        const temp =
-          document.createElement(
-            'textarea'
-          );
+        const temp = document.createElement('textarea');
 
-        temp.value =
-          text || '';
+        temp.value = text || '';
 
-        document.body.appendChild(
-          temp
-        );
+        document.body.appendChild(temp);
 
         temp.select();
 
-        document.execCommand(
-          'copy'
-        );
+        document.execCommand('copy');
 
         temp.remove();
 
       }
 
-
-      toast(
-        'تم نسخ الرابط',
-        'success'
-      );
-
+      toast('تم نسخ الرابط', 'success');
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-      toast(
-        'تعذر نسخ الرابط',
-        'error'
-      );
+      toast('تعذر نسخ الرابط', 'error');
 
     }
 
@@ -2744,195 +1695,95 @@
 
   function renderCustomers() {
 
-    const query =
-      (
-        customerSearchEl.value ||
-        ''
-      )
-        .toLowerCase()
-        .trim();
+    const query = (customerSearchEl.value || '').toLowerCase().trim();
 
 
-    const filtered =
-      customers.filter(
-        function (customer) {
+    const filtered = customers.filter(function (customer) {
 
-          const text =
-            (
-              customer.full_name ||
-              ''
-            ) +
-            ' ' +
-            (
-              customer.phone ||
-              ''
-            );
+      const text = (customer.full_name || '') + ' ' + (customer.phone || '');
+
+      return text.toLowerCase().includes(query);
+
+    });
 
 
-          return text
-            .toLowerCase()
-            .includes(query);
+    customersBodyEl.innerHTML = filtered.map(function (customer) {
 
-        }
-      );
-
-
-    customersBodyEl.innerHTML =
-      filtered.map(
-        function (customer) {
-
-          const cardCount =
-            cards.filter(
-              function (card) {
-
-                return (
-                  card.customer_id ===
-                  customer.id
-                );
-
-              }
-            ).length;
+      const cardCount = cards.filter(function (card) {
+        return card.customer_id === customer.id;
+      }).length;
 
 
-          const active =
-            (
-              customer.status ||
-              'active'
-            ) ===
-            'active';
+      const active = (customer.status || 'active') === 'active';
 
 
-          return `
-
-            <tr>
-
-              <td>
-                ${escapeHtml(
-                  customer.full_name ||
-                  ''
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  customer.phone ||
-                  ''
-                )}
-              </td>
-
-              <td>
-
-                <span
-                  class="status ${
-                    active
-                      ? 'success'
-                      : 'danger'
-                  }"
-                >
-                  ${escapeHtml(
-                    statusLabel(
-                      customer.status
-                    )
-                  )}
-                </span>
-
-              </td>
-
-              <td>
-                ${cardCount}
-              </td>
-
-              <td>
-
-                <div class="actions">
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-edit-customer="${escapeHtml(
-                      customer.id
-                    )}"
-                  >
-                    تعديل
-                  </button>
-
-                  <button
-                    class="btn danger"
-                    type="button"
-                    data-delete-customer="${escapeHtml(
-                      customer.id
-                    )}"
-                  >
-                    حذف
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      ).join('') || `
+      return `
 
         <tr>
 
-          <td
-            colspan="5"
-            class="empty"
-          >
-            لا يوجد عملاء.
+          <td>${escapeHtml(customer.full_name || '')}</td>
+
+          <td>${escapeHtml(customer.phone || '')}</td>
+
+          <td>
+            <span class="status ${active ? 'success' : 'danger'}">
+              ${escapeHtml(statusLabel(customer.status))}
+            </span>
+          </td>
+
+          <td>${cardCount}</td>
+
+          <td>
+            <div class="actions">
+
+              <button
+                class="btn"
+                type="button"
+                data-edit-customer="${escapeHtml(customer.id)}"
+              >
+                تعديل
+              </button>
+
+              <button
+                class="btn danger"
+                type="button"
+                data-delete-customer="${escapeHtml(customer.id)}"
+              >
+                حذف
+              </button>
+
+            </div>
           </td>
 
         </tr>
 
       `;
 
+    }).join('') || `
 
-    document
-      .querySelectorAll(
-        '[data-edit-customer]'
-      )
-      .forEach(
-        function (button) {
+      <tr>
+        <td colspan="5" class="empty">لا يوجد عملاء.</td>
+      </tr>
 
-          button.addEventListener(
-            'click',
-            function () {
-
-              editCustomer(
-                button.dataset.editCustomer
-              );
-
-            }
-          );
-
-        }
-      );
+    `;
 
 
-    document
-      .querySelectorAll(
-        '[data-delete-customer]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-edit-customer]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        editCustomer(button.dataset.editCustomer);
+      });
 
-              deleteCustomer(
-                button.dataset.deleteCustomer
-              );
+    });
 
-            }
-          );
 
-        }
-      );
+    document.querySelectorAll('[data-delete-customer]').forEach(function (button) {
+
+      button.addEventListener('click', function () {
+        deleteCustomer(button.dataset.deleteCustomer);
+      });
+
+    });
 
   }
 
@@ -2943,42 +1794,25 @@
 
   function editCustomer(id) {
 
-    const customer =
-      customers.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const customer = customers.find(function (item) { return item.id === id; });
+
+    if (!customer) return;
 
 
-    if (!customer) {
-      return;
-    }
-
-
-    modalTitleEl.textContent =
-      'تعديل العميل';
+    modalTitleEl.textContent = 'تعديل العميل';
 
 
     modalBodyEl.innerHTML = `
 
-      <form
-        class="form"
-        id="editCustomerForm"
-      >
+      <form class="form" id="editCustomerForm">
 
         <div class="field">
 
-          <label for="ecName">
-            الاسم
-          </label>
+          <label for="ecName">الاسم</label>
 
           <input
             id="ecName"
-            value="${escapeHtml(
-              customer.full_name ||
-              ''
-            )}"
+            value="${escapeHtml(customer.full_name || '')}"
             required
           >
 
@@ -2987,16 +1821,11 @@
 
         <div class="field">
 
-          <label for="ecPhone">
-            الهاتف
-          </label>
+          <label for="ecPhone">الهاتف</label>
 
           <input
             id="ecPhone"
-            value="${escapeHtml(
-              customer.phone ||
-              ''
-            )}"
+            value="${escapeHtml(customer.phone || '')}"
           >
 
         </div>
@@ -3004,33 +1833,15 @@
 
         <div class="field">
 
-          <label for="ecStatus">
-            الحالة
-          </label>
+          <label for="ecStatus">الحالة</label>
 
-          <select
-            id="ecStatus"
-          >
+          <select id="ecStatus">
 
-            <option
-              value="active"
-              ${
-                customer.status === 'active'
-                  ? 'selected'
-                  : ''
-              }
-            >
+            <option value="active" ${customer.status === 'active' ? 'selected' : ''}>
               نشط
             </option>
 
-            <option
-              value="suspended"
-              ${
-                customer.status === 'suspended'
-                  ? 'selected'
-                  : ''
-              }
-            >
+            <option value="suspended" ${customer.status === 'suspended' ? 'selected' : ''}>
               موقوف
             </option>
 
@@ -3039,12 +1850,7 @@
         </div>
 
 
-        <button
-          class="btn primary"
-          type="submit"
-        >
-          حفظ
-        </button>
+        <button class="btn primary" type="submit">حفظ</button>
 
       </form>
 
@@ -3054,96 +1860,48 @@
     modalEl.classList.add('show');
 
 
-    const form =
-      document.getElementById(
-        'editCustomerForm'
-      );
+    const form = document.getElementById('editCustomerForm');
 
-
-    form.addEventListener(
-      'submit',
-      function (event) {
-
-        saveCustomer(
-          event,
-          id
-        );
-
-      }
-    );
+    form.addEventListener('submit', function (event) {
+      saveCustomer(event, id);
+    });
 
   }
 
-
-  window.editCustomer =
-    editCustomer;
+  window.editCustomer = editCustomer;
 
 
   /* =========================================================
      SAVE CUSTOMER
   ========================================================= */
 
-  async function saveCustomer(
-    event,
-    id
-  ) {
+  async function saveCustomer(event, id) {
 
     event.preventDefault();
 
 
-    const nameEl =
-      document.getElementById(
-        'ecName'
-      );
-
-    const phoneEl =
-      document.getElementById(
-        'ecPhone'
-      );
-
-    const statusEl =
-      document.getElementById(
-        'ecStatus'
-      );
+    const nameEl = document.getElementById('ecName');
+    const phoneEl = document.getElementById('ecPhone');
+    const statusEl = document.getElementById('ecStatus');
 
 
-    const result =
-      await sb
-        .from('customers')
-        .update({
-
-          full_name:
-            nameEl.value.trim(),
-
-          phone:
-            phoneEl.value.trim(),
-
-          status:
-            statusEl.value
-
-        })
-        .eq(
-          'id',
-          id
-        );
+    const result = await sb
+      .from('customers')
+      .update({
+        full_name: nameEl.value.trim(),
+        phone: phoneEl.value.trim(),
+        status: statusEl.value
+      })
+      .eq('id', id);
 
 
     if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
+      toast(result.error.message, 'error');
       return;
     }
 
 
-    toast(
-      'تم حفظ بيانات العميل',
-      'success'
-    );
-
+    toast('تم حفظ بيانات العميل', 'success');
 
     closeModal();
 
@@ -3151,9 +1909,7 @@
 
   }
 
-
-  window.saveCustomer =
-    saveCustomer;
+  window.saveCustomer = saveCustomer;
 
 
   /* =========================================================
@@ -3162,50 +1918,25 @@
 
   async function deleteCustomer(id) {
 
-    if (
-      !confirm(
-        'هل تريد حذف العميل؟'
-      )
-    ) {
-
-      return;
-    }
+    if (!confirm('هل تريد حذف العميل؟')) return;
 
 
-    const result =
-      await sb
-        .from('customers')
-        .delete()
-        .eq(
-          'id',
-          id
-        );
+    const result = await sb.from('customers').delete().eq('id', id);
 
 
     if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
+      toast(result.error.message, 'error');
       return;
     }
 
 
-    toast(
-      'تم حذف العميل',
-      'success'
-    );
-
+    toast('تم حذف العميل', 'success');
 
     await load();
 
   }
 
-
-  window.deleteCustomer =
-    deleteCustomer;
+  window.deleteCustomer = deleteCustomer;
 
 
   /* =========================================================
@@ -3214,198 +1945,126 @@
 
   function renderCards() {
 
-    cardsBodyEl.innerHTML =
-      cards.map(
-        function (card) {
+    cardsBodyEl.innerHTML = cards.map(function (card) {
 
-          const customerName =
-            card.customers?.full_name ||
-            '—';
+      const customer =
+        customers.find(function (c) { return c.id === card.customer_id; });
 
-
-          const orderNumber =
-            card.orders?.order_number ||
-            '—';
+      const customerName = customer ? customer.full_name : '—';
 
 
-          const safeId =
-            String(card.id);
+      const order =
+        orders.find(function (o) { return o.id === card.order_id; });
+
+      const orderNumber = order ? order.order_number : '—';
 
 
-          return `
-
-            <tr>
-
-              <td>
-                ${escapeHtml(
-                  card.card_id ||
-                  ''
-                )}
-              </td>
+      const safeId = String(card.id);
 
 
-              <td>
-                ${escapeHtml(
-                  customerName
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  orderNumber
-                )}
-              </td>
-
-
-              <td>
-
-                <span
-                  class="status ${
-                    statusClass(
-                      card.status
-                    )
-                  }"
-                >
-                  ${escapeHtml(
-                    statusLabel(
-                      card.status
-                    )
-                  )}
-                </span>
-
-              </td>
-
-
-              <td>
-
-                <div
-                  class="actions"
-                >
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-copy-card="${escapeHtml(
-                      safeId
-                    )}"
-                  >
-                    نسخ
-                  </button>
-
-                  <button
-                    class="btn primary"
-                    type="button"
-                    data-open-card="${escapeHtml(
-                      safeId
-                    )}"
-                  >
-                    فتح
-                  </button>
-
-                </div>
-
-              </td>
-
-
-              <td>
-
-                <div
-                  class="actions"
-                >
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-show-qr="${escapeHtml(
-                      safeId
-                    )}"
-                  >
-                    معاينة
-                  </button>
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-download-qr="${escapeHtml(
-                      safeId
-                    )}"
-                  >
-                    تنزيل
-                  </button>
-
-                </div>
-
-              </td>
-
-
-              <td>
-
-                <button
-                  class="btn primary"
-                  type="button"
-                  data-nfc-card="${escapeHtml(
-                    safeId
-                  )}"
-                >
-                  📲 إدراج NFC
-                </button>
-
-              </td>
-
-
-              <td>
-
-                <div class="actions">
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-toggle-card="${escapeHtml(
-                      safeId
-                    )}"
-                  >
-                    ${
-                      card.status === 'suspended'
-                        ? 'تفعيل'
-                        : 'إيقاف'
-                    }
-                  </button>
-
-
-                  <button
-                    class="btn"
-                    type="button"
-                    data-replace-card="${escapeHtml(
-                      safeId
-                    )}"
-                  >
-                    بديل
-                  </button>
-
-                </div>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      ).join('') || `
+      return `
 
         <tr>
 
-          <td
-            colspan="8"
-            class="empty"
-          >
-            لا توجد بطاقات.
+          <td>${escapeHtml(card.card_id || '')}</td>
+
+          <td>${escapeHtml(customerName)}</td>
+
+          <td>${escapeHtml(orderNumber)}</td>
+
+          <td>
+            <span class="status ${statusClass(card.status)}">
+              ${escapeHtml(statusLabel(card.status))}
+            </span>
+          </td>
+
+          <td>
+            <div class="actions">
+
+              <button
+                class="btn"
+                type="button"
+                data-copy-card="${escapeHtml(safeId)}"
+              >
+                نسخ
+              </button>
+
+              <button
+                class="btn primary"
+                type="button"
+                data-open-card="${escapeHtml(safeId)}"
+              >
+                فتح
+              </button>
+
+            </div>
+          </td>
+
+          <td>
+            <div class="actions">
+
+              <button
+                class="btn"
+                type="button"
+                data-show-qr="${escapeHtml(safeId)}"
+              >
+                معاينة
+              </button>
+
+              <button
+                class="btn"
+                type="button"
+                data-download-qr="${escapeHtml(safeId)}"
+              >
+                تنزيل
+              </button>
+
+            </div>
+          </td>
+
+          <td>
+            <button
+              class="btn primary"
+              type="button"
+              data-nfc-card="${escapeHtml(safeId)}"
+            >
+              📲 إدراج NFC
+            </button>
+          </td>
+
+          <td>
+            <div class="actions">
+
+              <button
+                class="btn"
+                type="button"
+                data-toggle-card="${escapeHtml(safeId)}"
+              >
+                ${card.status === 'suspended' ? 'تفعيل' : 'إيقاف'}
+              </button>
+
+              <button
+                class="btn"
+                type="button"
+                data-replace-card="${escapeHtml(safeId)}"
+              >
+                بديل
+              </button>
+
+            </div>
           </td>
 
         </tr>
 
       `;
+
+    }).join('') || `
+
+      <tr>
+        <td colspan="8" class="empty">لا توجد بطاقات.</td>
+      </tr>
+
+    `;
 
 
     bindCardButtons();
@@ -3419,192 +2078,83 @@
 
   function bindCardButtons() {
 
-    document
-      .querySelectorAll(
-        '[data-copy-card]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-copy-card]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        copyCardUrl(button.dataset.copyCard);
+      });
 
-              copyCardUrl(
-                button.dataset.copyCard
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-open-card]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-open-card]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        openCard(button.dataset.openCard);
+      });
 
-              openCard(
-                button.dataset.openCard
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-show-qr]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-show-qr]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        showCard(button.dataset.showQr);
+      });
 
-              showCard(
-                button.dataset.showQr
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-download-qr]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-download-qr]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
 
-              const card =
-                cards.find(
-                  function (item) {
-                    return (
-                      item.id ===
-                      button.dataset.downloadQr
-                    );
-                  }
-                );
+        const card = cards.find(function (item) {
+          return item.id === button.dataset.downloadQr;
+        });
+
+        if (!card) return;
+
+        downloadQr(card.card_id, card.public_url);
+
+      });
+
+    });
 
 
-              if (!card) {
-                return;
-              }
+    document.querySelectorAll('[data-nfc-card]').forEach(function (button) {
+
+      button.addEventListener('click', function () {
+
+        const card = cards.find(function (item) {
+          return item.id === button.dataset.nfcCard;
+        });
+
+        if (!card) return;
+
+        nfc(card.id, card.order_id || '');
+
+      });
+
+    });
 
 
-              downloadQr(
-                card.card_id,
-                card.public_url
-              );
+    document.querySelectorAll('[data-toggle-card]').forEach(function (button) {
 
-            }
-          );
+      button.addEventListener('click', function () {
+        toggleCard(button.dataset.toggleCard);
+      });
 
-        }
-      );
+    });
 
 
-    document
-      .querySelectorAll(
-        '[data-nfc-card]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-replace-card]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        replaceCard(button.dataset.replaceCard);
+      });
 
-              const card =
-                cards.find(
-                  function (item) {
-                    return (
-                      item.id ===
-                      button.dataset.nfcCard
-                    );
-                  }
-                );
-
-
-              if (!card) {
-                return;
-              }
-
-
-              nfc(
-                card.id,
-                card.order_id || ''
-              );
-
-            }
-          );
-
-        }
-      );
-
-
-    document
-      .querySelectorAll(
-        '[data-toggle-card]'
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            'click',
-            function () {
-
-              toggleCard(
-                button.dataset.toggleCard
-              );
-
-            }
-          );
-
-        }
-      );
-
-
-    document
-      .querySelectorAll(
-        '[data-replace-card]'
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            'click',
-            function () {
-
-              replaceCard(
-                button.dataset.replaceCard
-              );
-
-            }
-          );
-
-        }
-      );
+    });
 
   }
 
@@ -3615,37 +2165,18 @@
 
   async function copyCardUrl(id) {
 
-    const card =
-      cards.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const card = cards.find(function (item) { return item.id === id; });
 
-
-    if (
-      !card ||
-      !card.public_url
-    ) {
-
-      toast(
-        'رابط البطاقة غير موجود',
-        'error'
-      );
-
+    if (!card || !card.public_url) {
+      toast('رابط البطاقة غير موجود', 'error');
       return;
     }
 
-
-    await copyText(
-      card.public_url
-    );
+    await copyText(card.public_url);
 
   }
 
-
-  window.copyCardUrl =
-    copyCardUrl;
+  window.copyCardUrl = copyCardUrl;
 
 
   /* =========================================================
@@ -3654,27 +2185,11 @@
 
   function openCard(id) {
 
-    const card =
-      cards.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const card = cards.find(function (item) { return item.id === id; });
 
+    if (!card || !card.public_url) return;
 
-    if (
-      !card ||
-      !card.public_url
-    ) {
-      return;
-    }
-
-
-    window.open(
-      card.public_url,
-      '_blank',
-      'noopener'
-    );
+    window.open(card.public_url, '_blank', 'noopener');
 
   }
 
@@ -3685,163 +2200,83 @@
 
   async function toggleCard(id) {
 
-    const card =
-      cards.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const card = cards.find(function (item) { return item.id === id; });
+
+    if (!card) return;
 
 
-    if (!card) {
-      return;
-    }
+    const newStatus = card.status === 'suspended' ? 'active' : 'suspended';
 
 
-    const newStatus =
-      card.status === 'suspended'
-        ? 'active'
-        : 'suspended';
-
-
-    const result =
-      await sb
-        .from('cards')
-        .update({
-          status:
-            newStatus
-        })
-        .eq(
-          'id',
-          id
-        );
+    const result = await sb
+      .from('cards')
+      .update({ status: newStatus })
+      .eq('id', id);
 
 
     if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
+      toast(result.error.message, 'error');
       return;
     }
 
 
-    toast(
-      'تم تحديث حالة البطاقة',
-      'success'
-    );
-
+    toast('تم تحديث حالة البطاقة', 'success');
 
     await load();
 
   }
 
-
-  window.toggleCard =
-    toggleCard;
+  window.toggleCard = toggleCard;
 
 
   /* =========================================================
      REPLACE CARD
   ========================================================= */
 
-  async function replaceCard(
-    id
-  ) {
+  async function replaceCard(id) {
 
-    const oldCard =
-      cards.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const oldCard = cards.find(function (item) { return item.id === id; });
+
+    if (!oldCard) return;
 
 
-    if (!oldCard) {
-      return;
-    }
-
-
-    if (
-      !confirm(
-        'إيقاف البطاقة الحالية وإصدار بطاقة بديلة؟'
-      )
-    ) {
-
-      return;
-    }
+    if (!confirm('إيقاف البطاقة الحالية وإصدار بطاقة بديلة؟')) return;
 
 
     try {
 
-      const oldResult =
-        await sb
-          .from('cards')
-          .update({
-            status:
-              'suspended'
-          })
-          .eq(
-            'id',
-            id
-          );
+      const oldResult = await sb
+        .from('cards')
+        .update({ status: 'suspended' })
+        .eq('id', id);
 
 
       if (oldResult.error) {
-
-        toast(
-          oldResult.error.message,
-          'error'
-        );
-
+        toast(oldResult.error.message, 'error');
         return;
       }
 
 
-      const newCardId =
-        generateCardId();
+      const newCardId = generateCardId();
+
+      const newPublicUrl = generatePublicUrl(newCardId);
 
 
-      const newPublicUrl =
-        generatePublicUrl(
-          newCardId
-        );
-
-
-      const newResult =
-        await sb
-          .from('cards')
-          .insert({
-
-            customer_id:
-              oldCard.customer_id,
-
-            order_id:
-              oldCard.order_id,
-
-            card_id:
-              newCardId,
-
-            public_url:
-              newPublicUrl,
-
-            status:
-              'unactivated'
-
-          })
-          .select()
-          .single();
+      const newResult = await sb
+        .from('cards')
+        .insert({
+          customer_id: oldCard.customer_id,
+          order_id: oldCard.order_id,
+          card_id: newCardId,
+          public_url: newPublicUrl,
+          status: 'unactivated'
+        })
+        .select()
+        .single();
 
 
       if (newResult.error) {
-
-        toast(
-          newResult.error.message,
-          'error'
-        );
-
+        toast(newResult.error.message, 'error');
         return;
       }
 
@@ -3849,212 +2284,112 @@
       await sb
         .from('profiles')
         .upsert(
-          {
-            card_id:
-              newResult.data.id
-          },
-          {
-            onConflict:
-              'card_id'
-          }
+          { card_id: newResult.data.id },
+          { onConflict: 'card_id' }
         );
 
 
       try {
 
-        await logAction(
-          'replace_card',
-          'card',
-          newResult.data.id,
-          {
-
-            old_card_id:
-              oldCard.card_id,
-
-            new_card_id:
-              newCardId
-
-          }
-        );
+        await logAction('replace_card', 'card', newResult.data.id, {
+          old_card_id: oldCard.card_id,
+          new_card_id: newCardId
+        });
 
       } catch (logError) {
 
-        console.warn(
-          logError
-        );
+        console.warn(logError);
 
       }
 
 
-      toast(
-        'تم إصدار البطاقة البديلة ' +
-        newCardId,
-        'success'
-      );
-
+      toast('تم إصدار البطاقة البديلة ' + newCardId, 'success');
 
       await load();
 
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-      toast(
-        error.message ||
-        'حدث خطأ أثناء إصدار البطاقة',
-        'error'
-      );
+      toast(error.message || 'حدث خطأ أثناء إصدار البطاقة', 'error');
 
     }
 
   }
 
-
-  window.replaceCard =
-    replaceCard;
+  window.replaceCard = replaceCard;
 
 
   /* =========================================================
      NFC
   ========================================================= */
 
-  async function nfc(
-    cardDbId,
-    orderId
-  ) {
+  async function nfc(cardDbId, orderId) {
 
-    const card =
-      cards.find(
-        function (item) {
-          return item.id === cardDbId;
-        }
-      );
+    const card = cards.find(function (item) { return item.id === cardDbId; });
 
-
-    if (!card) {
-      return;
-    }
+    if (!card) return;
 
 
     try {
 
-      toast(
-        'قرّب بطاقة ZOMA من الهاتف…',
-        'info'
-      );
+      toast('قرّب بطاقة ZOMA من الهاتف…', 'info');
 
 
-      if (
-        !window.zoma ||
-        typeof window.zoma.writeNfc !== 'function'
-      ) {
-
-        throw new Error(
-          'وظيفة NFC غير موجودة في app.js'
-        );
-
+      if (!window.zoma || typeof window.zoma.writeNfc !== 'function') {
+        throw new Error('وظيفة NFC غير موجودة في app.js');
       }
 
 
-      await window.zoma.writeNfc(
-        card,
-        orderId
-      );
+      await window.zoma.writeNfc(card, orderId);
 
-
-      toast(
-        'تم إدراج رابط NFC بنجاح',
-        'success'
-      );
+      toast('تم إدراج رابط NFC بنجاح', 'success');
 
 
     } catch (error) {
 
-      console.error(
-        error
-      );
+      console.error(error);
 
-      toast(
-        error.message ||
-        'فشل إدراج NFC',
-        'error'
-      );
+      toast(error.message || 'فشل إدراج NFC', 'error');
 
     }
 
   }
 
-
-  window.nfc =
-    nfc;
+  window.nfc = nfc;
 
 
   /* =========================================================
      NEW CARD
   ========================================================= */
 
-  newCardBtn.addEventListener(
-    'click',
-    async function () {
+  newCardBtn.addEventListener('click', async function () {
 
-      /*
-       * نحاول العثور على طلب ليس له بطاقة
-       */
+    const orderWithoutCard = orders.find(function (order) {
 
-      const orderWithoutCard =
-        orders.find(
-          function (order) {
+      return !cards.some(function (card) {
+        return card.order_id === order.id;
+      });
 
-            return !cards.some(
-              function (card) {
-
-                return (
-                  card.order_id ===
-                  order.id
-                );
-
-              }
-            );
-
-          }
-        );
+    });
 
 
-      if (orderWithoutCard) {
-
-        await issueCard(
-          orderWithoutCard.id
-        );
-
-        return;
-      }
-
-
-      /*
-       * لو لا يوجد طلب بدون بطاقة
-       * نعرض أول بطاقة كخيار بديل.
-       */
-
-      if (cards.length) {
-
-        await replaceCard(
-          cards[0].id
-        );
-
-        return;
-      }
-
-
-      toast(
-        'لا يوجد طلب لإصدار بطاقة له',
-        'error'
-      );
-
+    if (orderWithoutCard) {
+      await issueCard(orderWithoutCard.id);
+      return;
     }
-  );
+
+
+    if (cards.length) {
+      await replaceCard(cards[0].id);
+      return;
+    }
+
+
+    toast('لا يوجد طلب لإصدار بطاقة له', 'error');
+
+  });
 
 
   /* =========================================================
@@ -4063,161 +2398,100 @@
 
   function renderDesigns() {
 
-    designsGridEl.innerHTML =
-      designs.map(
-        function (design) {
+    designsGridEl.innerHTML = designs.map(function (design) {
 
-          const image =
-            design.preview_url ||
-            '';
+      const image = design.preview_url || '';
 
 
-          return `
+      return `
 
-            <div class="panel design">
+        <div class="panel design">
 
-              <div
-                class="design-preview"
-                style="
-                  min-height:220px;
-                  display:flex;
-                  align-items:center;
-                  justify-content:center;
-                  overflow:hidden;
-                  border-radius:14px;
-                "
-              >
+          <div
+            class="design-preview"
+            style="
+              min-height:220px;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              overflow:hidden;
+              border-radius:14px;
+            "
+          >
 
-                ${
-                  image
+            ${
+              image
+                ? `
+                  <img
+                    src="${escapeHtml(image)}"
+                    alt="${escapeHtml(design.name || '')}"
+                    style="
+                      width:100%;
+                      height:220px;
+                      object-fit:cover;
+                    "
+                  >
+                `
+                : `
+                  <div class="muted">لا توجد معاينة</div>
+                `
+            }
 
-                    ? `
-                      <img
-                        src="${escapeHtml(
-                          image
-                        )}"
-                        alt="${escapeHtml(
-                          design.name ||
-                          ''
-                        )}"
-                        style="
-                          width:100%;
-                          height:220px;
-                          object-fit:cover;
-                        "
-                      >
-                    `
-
-                    : `
-                      <div class="muted">
-                        لا توجد معاينة
-                      </div>
-                    `
-                }
-
-              </div>
+          </div>
 
 
-              <h3>
-                ${escapeHtml(
-                  design.name ||
-                  ''
-                )}
-              </h3>
+          <h3>${escapeHtml(design.name || '')}</h3>
+
+          <p>${money(design.price)}</p>
 
 
-              <p>
-                ${money(
-                  design.price
-                )}
-              </p>
+          <div class="actions">
 
+            <button
+              class="btn"
+              type="button"
+              data-toggle-design="${escapeHtml(design.id)}"
+            >
+              ${design.is_available ? 'إيقاف' : 'تفعيل'}
+            </button>
 
-              <div class="actions">
+            <button
+              class="btn danger"
+              type="button"
+              data-delete-design="${escapeHtml(design.id)}"
+            >
+              حذف
+            </button>
 
-                <button
-                  class="btn"
-                  type="button"
-                  data-toggle-design="${escapeHtml(
-                    design.id
-                  )}"
-                >
-                  ${
-                    design.is_available
-                      ? 'إيقاف'
-                      : 'تفعيل'
-                  }
-                </button>
+          </div>
 
-
-                <button
-                  class="btn danger"
-                  type="button"
-                  data-delete-design="${escapeHtml(
-                    design.id
-                  )}"
-                >
-                  حذف
-                </button>
-
-              </div>
-
-            </div>
-
-          `;
-
-        }
-      ).join('') || `
-
-        <div class="empty">
-          لا توجد تصميمات.
         </div>
 
       `;
 
+    }).join('') || `
 
-    document
-      .querySelectorAll(
-        '[data-toggle-design]'
-      )
-      .forEach(
-        function (button) {
+      <div class="empty">لا توجد تصميمات.</div>
 
-          button.addEventListener(
-            'click',
-            function () {
-
-              toggleDesign(
-                button.dataset.toggleDesign
-              );
-
-            }
-          );
-
-        }
-      );
+    `;
 
 
-    document
-      .querySelectorAll(
-        '[data-delete-design]'
-      )
-      .forEach(
-        function (button) {
+    document.querySelectorAll('[data-toggle-design]').forEach(function (button) {
 
-          button.addEventListener(
-            'click',
-            function () {
+      button.addEventListener('click', function () {
+        toggleDesign(button.dataset.toggleDesign);
+      });
 
-              deleteDesign(
-                button.dataset.deleteDesign
-              );
+    });
 
-            }
-          );
 
-        }
-      );
+    document.querySelectorAll('[data-delete-design]').forEach(function (button) {
+
+      button.addEventListener('click', function () {
+        deleteDesign(button.dataset.deleteDesign);
+      });
+
+    });
 
   }
 
@@ -4226,919 +2500,97 @@
      TOGGLE DESIGN
   ========================================================= */
 
-  async function toggleDesign(
-    id
-  ) {
+  async function toggleDesign(id) {
 
-    const design =
-      designs.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
+    const design = designs.find(function (item) { return item.id === id; });
+
+    if (!design) return;
 
 
-    if (!design) {
-      return;
-    }
-
-
-    const result =
-      await sb
-        .from('designs')
-        .update({
-          is_available:
-            !design.is_available
-        })
-        .eq(
-          'id',
-          id
-        );
+    const result = await sb
+      .from('designs')
+      .update({ is_available: !design.is_available })
+      .eq('id', id);
 
 
     if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
+      toast(result.error.message, 'error');
       return;
     }
-
 
     await load();
 
   }
 
-
-  window.toggleDesign =
-    toggleDesign;
+  window.toggleDesign = toggleDesign;
 
 
   /* =========================================================
      DELETE DESIGN
   ========================================================= */
 
-  async function deleteDesign(
-    id
-  ) {
+  async function deleteDesign(id) {
 
-    if (
-      !confirm(
-        'هل تريد حذف التصميم؟'
-      )
-    ) {
-      return;
-    }
+    if (!confirm('هل تريد حذف التصميم؟')) return;
 
 
-    const result =
-      await sb
-        .from('designs')
-        .delete()
-        .eq(
-          'id',
-          id
-        );
+    const result = await sb.from('designs').delete().eq('id', id);
 
 
     if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
+      toast(result.error.message, 'error');
       return;
     }
 
 
-    toast(
-      'تم حذف التصميم',
-      'success'
-    );
-
+    toast('تم حذف التصميم', 'success');
 
     await load();
 
   }
 
-
-  window.deleteDesign =
-    deleteDesign;
+  window.deleteDesign = deleteDesign;
 
 
   /* =========================================================
      ADD DESIGN
   ========================================================= */
 
-  addDesignBtn.addEventListener(
-    'click',
-    function () {
+  addDesignBtn.addEventListener('click', function () {
 
-      modalTitleEl.textContent =
-        'إضافة تصميم';
-
-
-      modalBodyEl.innerHTML = `
-
-        <form
-          class="form"
-          id="createDesignForm"
-        >
-
-          <div class="field">
-
-            <label for="dn">
-              الاسم
-            </label>
-
-            <input
-              id="dn"
-              required
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="dp">
-              السعر
-            </label>
-
-            <input
-              id="dp"
-              type="number"
-              min="0"
-              step="0.01"
-              required
-            >
-
-          </div>
-
-
-          <div class="field">
-
-            <label for="di">
-              رابط صورة التصميم
-            </label>
-
-            <input
-              id="di"
-              type="url"
-              placeholder="https://..."
-            >
-
-          </div>
-
-
-          <div class="notice-box">
-
-            يمكنك ترك رابط الصورة فارغًا،
-            لكن الأفضل إضافة صورة حتى تظهر
-            معاينة التصميم للعميل.
-
-          </div>
-
-
-          <button
-            class="btn primary"
-            type="submit"
-          >
-            إضافة
-          </button>
-
-        </form>
-
-      `;
-
-
-      modalEl.classList.add('show');
-
-
-      const form =
-        document.getElementById(
-          'createDesignForm'
-        );
-
-
-      form.addEventListener(
-        'submit',
-        createDesign
-      );
-
-    }
-  );
-
-
-  /* =========================================================
-     CREATE DESIGN
-  ========================================================= */
-
-  async function createDesign(
-    event
-  ) {
-
-    event.preventDefault();
-
-
-    const nameEl =
-      document.getElementById('dn');
-
-    const priceEl =
-      document.getElementById('dp');
-
-    const imageEl =
-      document.getElementById('di');
-
-
-    const designCode =
-      'DES-' +
-      Math.random()
-        .toString(36)
-        .slice(2, 7)
-        .toUpperCase();
-
-
-    const imageUrl =
-      imageEl.value.trim();
-
-
-    const payload = {
-
-      design_code:
-        designCode,
-
-      name:
-        nameEl.value.trim(),
-
-      price:
-        Number(
-          priceEl.value
-        ),
-
-      is_available:
-        true,
-
-      nfc_available:
-        true,
-
-      qr_available:
-        true
-
-    };
-
-
-    /*
-     * preview_url هو عمود الصورة المعتمد في قاعدة البيانات.
-     */
-    if (imageUrl) {
-      payload.preview_url = imageUrl;
-    }
-
-    const result =
-      await sb
-        .from('designs')
-        .insert(payload);
-
-
-    if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
-      return;
-    }
-
-
-    toast(
-      'تمت إضافة التصميم',
-      'success'
-    );
-
-
-    closeModal();
-
-    await load();
-
-  }
-
-
-  window.createDesign =
-    createDesign;
-
-
-  /* =========================================================
-     MESSAGES
-  ========================================================= */
-
-  function renderMessages() {
-
-    messagesBodyEl.innerHTML =
-      messages.map(
-        function (message) {
-
-          return `
-
-            <tr>
-
-              <td>
-
-                ${
-                  message.created_at
-                    ? new Date(
-                        message.created_at
-                      ).toLocaleString(
-                        'ar-EG'
-                      )
-                    : '—'
-                }
-
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  message.subject ||
-                  '—'
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  message.body ||
-                  ''
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  message.status ||
-                  'open'
-                )}
-              </td>
-
-
-              <td>
-
-                <button
-                  class="btn success"
-                  type="button"
-                  data-close-message="${escapeHtml(
-                    message.id
-                  )}"
-                >
-                  تم الحل
-                </button>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      ).join('') || `
-
-        <tr>
-
-          <td
-            colspan="5"
-            class="empty"
-          >
-            لا توجد رسائل.
-          </td>
-
-        </tr>
-
-      `;
-
-
-    document
-      .querySelectorAll(
-        '[data-close-message]'
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            'click',
-            function () {
-
-              closeMessage(
-                button.dataset.closeMessage
-              );
-
-            }
-          );
-
-        }
-      );
-
-  }
-
-
-  /* =========================================================
-     CLOSE MESSAGE
-  ========================================================= */
-
-  async function closeMessage(
-    id
-  ) {
-
-    const result =
-      await sb
-        .from('messages')
-        .update({
-          status:
-            'closed'
-        })
-        .eq(
-          'id',
-          id
-        );
-
-
-    if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
-      return;
-    }
-
-
-    await load();
-
-  }
-
-
-  window.closeMessage =
-    closeMessage;
-
-
-  /* =========================================================
-     ADMINS
-  ========================================================= */
-
-  function renderAdmins() {
-
-    adminsBodyEl.innerHTML =
-      admins.map(
-        function (adminItem) {
-
-          const roleId =
-            'role_' +
-            String(
-              adminItem.id
-            )
-              .replace(
-                /[^a-zA-Z0-9_-]/g,
-                ''
-              );
-
-
-          return `
-
-            <tr>
-
-              <td>
-                ${escapeHtml(
-                  adminItem.username ||
-                  ''
-                )}
-              </td>
-
-
-              <td>
-                ${escapeHtml(
-                  adminItem.full_name ||
-                  ''
-                )}
-              </td>
-
-
-              <td>
-
-                <select
-                  id="${escapeHtml(
-                    roleId
-                  )}"
-                >
-
-                  <option
-                    value="owner"
-                    ${
-                      adminItem.role ===
-                      'owner'
-                        ? 'selected'
-                        : ''
-                    }
-                  >
-                    owner
-                  </option>
-
-
-                  <option
-                    value="manager"
-                    ${
-                      adminItem.role ===
-                      'manager'
-                        ? 'selected'
-                        : ''
-                    }
-                  >
-                    manager
-                  </option>
-
-
-                  <option
-                    value="support"
-                    ${
-                      adminItem.role ===
-                      'support'
-                        ? 'selected'
-                        : ''
-                    }
-                  >
-                    support
-                  </option>
-
-                </select>
-
-              </td>
-
-
-              <td>
-
-                <button
-                  class="btn"
-                  type="button"
-                  data-permissions="${escapeHtml(
-                    adminItem.id
-                  )}"
-                >
-                  صلاحيات
-                </button>
-
-              </td>
-
-
-              <td>
-
-                <button
-                  class="btn"
-                  type="button"
-                  data-save-role-id="${escapeHtml(
-                    adminItem.id
-                  )}"
-                  data-save-role-element="${escapeHtml(
-                    roleId
-                  )}"
-                >
-                  حفظ
-                </button>
-
-              </td>
-
-            </tr>
-
-          `;
-
-        }
-      ).join('') || `
-
-        <tr>
-
-          <td
-            colspan="5"
-            class="empty"
-          >
-            لا يوجد مشرفون.
-          </td>
-
-        </tr>
-
-      `;
-
-
-    document
-      .querySelectorAll(
-        '[data-save-role-id]'
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            'click',
-            function () {
-
-              saveRole(
-                button.dataset.saveRoleId,
-                button.dataset.saveRoleElement
-              );
-
-            }
-          );
-
-        }
-      );
-
-
-    document
-      .querySelectorAll(
-        '[data-permissions]'
-      )
-      .forEach(
-        function (button) {
-
-          button.addEventListener(
-            'click',
-            function () {
-
-              permissions(
-                button.dataset.permissions
-              );
-
-            }
-          );
-
-        }
-      );
-
-  }
-
-
-  /* =========================================================
-     SAVE ROLE
-  ========================================================= */
-
-  async function saveRole(
-    adminId,
-    roleElementId
-  ) {
-
-    const roleElement =
-      document.getElementById(
-        roleElementId
-      );
-
-
-    if (!roleElement) {
-      return;
-    }
-
-
-    await roleChange(
-      adminId,
-      roleElement.value
-    );
-
-  }
-
-
-  window.saveRole =
-    saveRole;
-
-
-  /* =========================================================
-     ROLE CHANGE
-  ========================================================= */
-
-  async function roleChange(
-    id,
-    role
-  ) {
-
-    const result =
-      await sb
-        .from('admins')
-        .update({
-          role:
-            role
-        })
-        .eq(
-          'id',
-          id
-        );
-
-
-    if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
-      return;
-    }
-
-
-    toast(
-      'تم تحديث الدور',
-      'success'
-    );
-
-
-    await load();
-
-  }
-
-
-  window.roleChange =
-    roleChange;
-
-
-  /* =========================================================
-     PERMISSIONS
-  ========================================================= */
-
-  async function permissions(
-    id
-  ) {
-
-    const adminItem =
-      admins.find(
-        function (item) {
-          return item.id === id;
-        }
-      );
-
-
-    if (!adminItem) {
-      return;
-    }
-
-
-    const sections = [
-
-      'orders',
-
-      'customers',
-
-      'cards',
-
-      'designs',
-
-      'messages',
-
-      'settings'
-
-    ];
-
-
-    const result =
-      await sb
-        .from('admin_permissions')
-        .select('*')
-        .eq(
-          'admin_id',
-          id
-        );
-
-
-    if (result.error) {
-
-      toast(
-        result.error.message,
-        'error'
-      );
-
-      return;
-    }
-
-
-    const permissionMap =
-      Object.fromEntries(
-        (
-          result.data ||
-          []
-        ).map(
-          function (item) {
-
-            return [
-              item.section,
-              item
-            ];
-
-          }
-        )
-      );
-
-
-    modalTitleEl.textContent =
-      'صلاحيات ' +
-      (
-        adminItem.username ||
-        ''
-      );
+    modalTitleEl.textContent = 'إضافة تصميم';
 
 
     modalBodyEl.innerHTML = `
 
-      <form
-        id="permForm"
-        class="form"
-      >
+      <form class="form" id="createDesignForm">
 
-        ${
-
-          sections
-            .map(
-              function (section) {
-
-                const permission =
-                  permissionMap[section] ||
-                  {};
+        <div class="field">
+          <label for="dn">الاسم</label>
+          <input id="dn" required>
+        </div>
 
 
-                return `
-
-                  <div
-                    class="notice-box"
-                  >
-
-                    <b>
-                      ${escapeHtml(
-                        section
-                      )}
-                    </b>
+        <div class="field">
+          <label for="dp">السعر</label>
+          <input id="dp" type="number" min="0" step="0.01" required>
+        </div>
 
 
-                    <label
-                      style="
-                        display:block;
-                        margin-top:10px
-                      "
-                    >
-
-                      <input
-                        type="checkbox"
-                        data-sec="${escapeHtml(
-                          section
-                        )}"
-                        data-k="view"
-                        ${
-                          permission.can_view
-                            ? 'checked'
-                            : ''
-                        }
-                      >
-
-                      عرض
-
-                    </label>
+        <div class="field">
+          <label for="di">رابط صورة التصميم</label>
+          <input id="di" type="url" placeholder="https://...">
+        </div>
 
 
-                    <label
-                      style="
-                        display:block;
-                        margin-top:8px
-                      "
-                    >
-
-                      <input
-                        type="checkbox"
-                        data-sec="${escapeHtml(
-                          section
-                        )}"
-                        data-k="edit"
-                        ${
-                          permission.can_edit
-                            ? 'checked'
-                            : ''
-                        }
-                      >
-
-                      تعديل
-
-                    </label>
-
-                  </div>
-
-                `;
-
-              }
-            )
-            .join('')
-
-        }
+        <div class="notice-box">
+          يمكنك ترك رابط الصورة فارغًا،
+          لكن الأفضل إضافة صورة حتى تظهر
+          معاينة التصميم للعميل.
+        </div>
 
 
-        <button
-          class="btn primary"
-          type="submit"
-        >
-          حفظ الصلاحيات
-        </button>
+        <button class="btn primary" type="submit">إضافة</button>
 
       </form>
 
@@ -5148,217 +2600,508 @@
     modalEl.classList.add('show');
 
 
-    const permissionForm =
-      document.getElementById(
-        'permForm'
-      );
+    const form = document.getElementById('createDesignForm');
+
+    form.addEventListener('submit', createDesign);
+
+  });
 
 
-    permissionForm.addEventListener(
-      'submit',
-      async function (event) {
+  /* =========================================================
+     CREATE DESIGN
+  ========================================================= */
 
-        event.preventDefault();
+  async function createDesign(event) {
 
-
-        const deleteResult =
-          await sb
-            .from('admin_permissions')
-            .delete()
-            .eq(
-              'admin_id',
-              id
-            );
+    event.preventDefault();
 
 
-        if (deleteResult.error) {
-
-          toast(
-            deleteResult.error.message,
-            'error'
-          );
-
-          return;
-        }
+    const nameEl = document.getElementById('dn');
+    const priceEl = document.getElementById('dp');
+    const imageEl = document.getElementById('di');
 
 
-        const rows =
-          sections.map(
-            function (section) {
-
-              const viewCheckbox =
-                document.querySelector(
-                  '[data-sec="' +
-                  section +
-                  '"][data-k="view"]'
-                );
+    const designCode =
+      'DES-' + Math.random().toString(36).slice(2, 7).toUpperCase();
 
 
-              const editCheckbox =
-                document.querySelector(
-                  '[data-sec="' +
-                  section +
-                  '"][data-k="edit"]'
-                );
+    const imageUrl = imageEl.value.trim();
 
 
-              return {
+    const payload = {
+      design_code: designCode,
+      name: nameEl.value.trim(),
+      price: Number(priceEl.value),
+      is_available: true,
+      nfc_available: true,
+      qr_available: true
+    };
 
-                admin_id:
-                  id,
 
-                section:
-                  section,
+    if (imageUrl) {
+      payload.preview_url = imageUrl;
+    }
 
-                can_view:
-                  viewCheckbox
-                    ? viewCheckbox.checked
-                    : false,
 
-                can_edit:
-                  editCheckbox
-                    ? editCheckbox.checked
-                    : false
+    const result = await sb.from('designs').insert(payload);
 
-              };
 
+    if (result.error) {
+      toast(result.error.message, 'error');
+      return;
+    }
+
+
+    toast('تمت إضافة التصميم', 'success');
+
+    closeModal();
+
+    await load();
+
+  }
+
+  window.createDesign = createDesign;
+
+
+  /* =========================================================
+     MESSAGES
+  ========================================================= */
+
+  function renderMessages() {
+
+    messagesBodyEl.innerHTML = messages.map(function (message) {
+
+      return `
+
+        <tr>
+
+          <td>
+            ${
+              message.created_at
+                ? new Date(message.created_at).toLocaleString('ar-EG')
+                : '—'
             }
-          );
+          </td>
+
+          <td>${escapeHtml(message.subject || '—')}</td>
+
+          <td>${escapeHtml(message.body || '')}</td>
+
+          <td>${escapeHtml(message.status || 'open')}</td>
+
+          <td>
+            <button
+              class="btn success"
+              type="button"
+              data-close-message="${escapeHtml(message.id)}"
+            >
+              تم الحل
+            </button>
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join('') || `
+
+      <tr>
+        <td colspan="5" class="empty">لا توجد رسائل.</td>
+      </tr>
+
+    `;
 
 
-        const insertResult =
-          await sb
-            .from('admin_permissions')
-            .insert(
-              rows
-            );
+    document.querySelectorAll('[data-close-message]').forEach(function (button) {
 
+      button.addEventListener('click', function () {
+        closeMessage(button.dataset.closeMessage);
+      });
 
-        if (insertResult.error) {
-
-          toast(
-            insertResult.error.message,
-            'error'
-          );
-
-          return;
-        }
-
-
-        toast(
-          'تم حفظ الصلاحيات',
-          'success'
-        );
-
-
-        closeModal();
-
-      }
-    );
+    });
 
   }
 
 
-  window.permissions =
-    permissions;
+  /* =========================================================
+     CLOSE MESSAGE
+  ========================================================= */
+
+  async function closeMessage(id) {
+
+    const result = await sb
+      .from('messages')
+      .update({ status: 'closed' })
+      .eq('id', id);
+
+
+    if (result.error) {
+      toast(result.error.message, 'error');
+      return;
+    }
+
+    await load();
+
+  }
+
+  window.closeMessage = closeMessage;
+
+
+  /* =========================================================
+     ADMINS
+  ========================================================= */
+
+  function renderAdmins() {
+
+    adminsBodyEl.innerHTML = admins.map(function (adminItem) {
+
+      const roleId =
+        'role_' + String(adminItem.id).replace(/[^a-zA-Z0-9_-]/g, '');
+
+
+      return `
+
+        <tr>
+
+          <td>${escapeHtml(adminItem.username || '')}</td>
+
+          <td>${escapeHtml(adminItem.full_name || '')}</td>
+
+          <td>
+            <select id="${escapeHtml(roleId)}">
+
+              <option value="owner" ${adminItem.role === 'owner' ? 'selected' : ''}>
+                owner
+              </option>
+
+              <option value="manager" ${adminItem.role === 'manager' ? 'selected' : ''}>
+                manager
+              </option>
+
+              <option value="support" ${adminItem.role === 'support' ? 'selected' : ''}>
+                support
+              </option>
+
+            </select>
+          </td>
+
+          <td>
+            <button
+              class="btn"
+              type="button"
+              data-permissions="${escapeHtml(adminItem.id)}"
+            >
+              صلاحيات
+            </button>
+          </td>
+
+          <td>
+            <button
+              class="btn"
+              type="button"
+              data-save-role-id="${escapeHtml(adminItem.id)}"
+              data-save-role-element="${escapeHtml(roleId)}"
+            >
+              حفظ
+            </button>
+          </td>
+
+        </tr>
+
+      `;
+
+    }).join('') || `
+
+      <tr>
+        <td colspan="5" class="empty">لا يوجد مشرفون.</td>
+      </tr>
+
+    `;
+
+
+    document.querySelectorAll('[data-save-role-id]').forEach(function (button) {
+
+      button.addEventListener('click', function () {
+        saveRole(button.dataset.saveRoleId, button.dataset.saveRoleElement);
+      });
+
+    });
+
+
+    document.querySelectorAll('[data-permissions]').forEach(function (button) {
+
+      button.addEventListener('click', function () {
+        permissions(button.dataset.permissions);
+      });
+
+    });
+
+  }
+
+
+  /* =========================================================
+     SAVE ROLE
+  ========================================================= */
+
+  async function saveRole(adminId, roleElementId) {
+
+    const roleElement = document.getElementById(roleElementId);
+
+    if (!roleElement) return;
+
+    await roleChange(adminId, roleElement.value);
+
+  }
+
+  window.saveRole = saveRole;
+
+
+  /* =========================================================
+     ROLE CHANGE
+  ========================================================= */
+
+  async function roleChange(id, role) {
+
+    const result = await sb
+      .from('admins')
+      .update({ role: role })
+      .eq('id', id);
+
+
+    if (result.error) {
+      toast(result.error.message, 'error');
+      return;
+    }
+
+
+    toast('تم تحديث الدور', 'success');
+
+    await load();
+
+  }
+
+  window.roleChange = roleChange;
+
+
+  /* =========================================================
+     PERMISSIONS
+  ========================================================= */
+
+  async function permissions(id) {
+
+    const adminItem = admins.find(function (item) { return item.id === id; });
+
+    if (!adminItem) return;
+
+
+    const sections = [
+      'orders',
+      'customers',
+      'cards',
+      'designs',
+      'messages',
+      'settings'
+    ];
+
+
+    const result = await sb
+      .from('admin_permissions')
+      .select('*')
+      .eq('admin_id', id);
+
+
+    if (result.error) {
+      toast(result.error.message, 'error');
+      return;
+    }
+
+
+    const permissionMap = Object.fromEntries(
+      (result.data || []).map(function (item) {
+        return [item.section, item];
+      })
+    );
+
+
+    modalTitleEl.textContent =
+      'صلاحيات ' + (adminItem.username || '');
+
+
+    modalBodyEl.innerHTML = `
+
+      <form id="permForm" class="form">
+
+        ${
+          sections.map(function (section) {
+
+            const permission = permissionMap[section] || {};
+
+            return `
+
+              <div class="notice-box">
+
+                <b>${escapeHtml(section)}</b>
+
+                <label style="display:block;margin-top:10px">
+
+                  <input
+                    type="checkbox"
+                    data-sec="${escapeHtml(section)}"
+                    data-k="view"
+                    ${permission.can_view ? 'checked' : ''}
+                  >
+
+                  عرض
+
+                </label>
+
+
+                <label style="display:block;margin-top:8px">
+
+                  <input
+                    type="checkbox"
+                    data-sec="${escapeHtml(section)}"
+                    data-k="edit"
+                    ${permission.can_edit ? 'checked' : ''}
+                  >
+
+                  تعديل
+
+                </label>
+
+              </div>
+
+            `;
+
+          }).join('')
+        }
+
+
+        <button class="btn primary" type="submit">حفظ الصلاحيات</button>
+
+      </form>
+
+    `;
+
+
+    modalEl.classList.add('show');
+
+
+    const permissionForm = document.getElementById('permForm');
+
+
+    permissionForm.addEventListener('submit', async function (event) {
+
+      event.preventDefault();
+
+
+      const deleteResult = await sb
+        .from('admin_permissions')
+        .delete()
+        .eq('admin_id', id);
+
+
+      if (deleteResult.error) {
+        toast(deleteResult.error.message, 'error');
+        return;
+      }
+
+
+      const rows = sections.map(function (section) {
+
+        const viewCheckbox = document.querySelector(
+          '[data-sec="' + section + '"][data-k="view"]'
+        );
+
+        const editCheckbox = document.querySelector(
+          '[data-sec="' + section + '"][data-k="edit"]'
+        );
+
+
+        return {
+          admin_id: id,
+          section: section,
+          can_view: viewCheckbox ? viewCheckbox.checked : false,
+          can_edit: editCheckbox ? editCheckbox.checked : false
+        };
+
+      });
+
+
+      const insertResult = await sb
+        .from('admin_permissions')
+        .insert(rows);
+
+
+      if (insertResult.error) {
+        toast(insertResult.error.message, 'error');
+        return;
+      }
+
+
+      toast('تم حفظ الصلاحيات', 'success');
+
+      closeModal();
+
+    });
+
+  }
+
+  window.permissions = permissions;
 
 
   /* =========================================================
      RESET DATA
   ========================================================= */
 
-  resetDataBtn.addEventListener(
-    'click',
-    async function () {
+  resetDataBtn.addEventListener('click', async function () {
 
-      if (!admin) {
+    if (!admin) return;
+
+
+    if (admin.role !== 'owner') {
+      toast('هذا الإجراء للمالك فقط', 'error');
+      return;
+    }
+
+
+    if (!confirm('سيتم حذف بيانات التشغيل. هل أنت متأكد؟')) return;
+
+
+    try {
+
+      const result = await sb.rpc('zoma_reset_year_data');
+
+
+      if (result.error) {
+        toast(result.error.message, 'error');
         return;
       }
 
 
-      if (
-        admin.role !==
-        'owner'
-      ) {
+      toast('تم حذف بيانات السنة', 'success');
 
-        toast(
-          'هذا الإجراء للمالك فقط',
-          'error'
-        );
-
-        return;
-      }
+      await load();
 
 
-      if (
-        !confirm(
-          'سيتم حذف بيانات التشغيل. هل أنت متأكد؟'
-        )
-      ) {
+    } catch (error) {
 
-        return;
-      }
+      console.error(error);
 
-
-      try {
-
-        const result =
-          await sb.rpc(
-            'zoma_reset_year_data'
-          );
-
-
-        if (result.error) {
-
-          toast(
-            result.error.message,
-            'error'
-          );
-
-          return;
-        }
-
-
-        toast(
-          'تم حذف بيانات السنة',
-          'success'
-        );
-
-
-        await load();
-
-
-      } catch (error) {
-
-        console.error(
-          error
-        );
-
-        toast(
-          'حدث خطأ أثناء حذف البيانات',
-          'error'
-        );
-
-      }
+      toast('حدث خطأ أثناء حذف البيانات', 'error');
 
     }
-  );
+
+  });
 
 
   /* =========================================================
      SEARCH
   ========================================================= */
 
-  orderSearchEl.addEventListener(
-    'input',
-    renderOrders
-  );
+  orderSearchEl.addEventListener('input', renderOrders);
 
-
-  customerSearchEl.addEventListener(
-    'input',
-    renderCustomers
-  );
+  customerSearchEl.addEventListener('input', renderCustomers);
 
 
   /* =========================================================
